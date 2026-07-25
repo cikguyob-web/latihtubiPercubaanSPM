@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Kertas 1 Perniagaan · SPM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --kertas:#E9EEE3;--kad:#F8FAF4;--dakwat:#1B2A21;--dakwat-lembut:#5A6B5F;
+  --garis:#C6D2BC;--lejar:#2F6B4F;--pen:#C33B2E;--syiling:#D8A32B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--kertas);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,rgba(47,107,79,.07) 31px 32px);
+  color:var(--dakwat);font-family:'Instrument Sans',system-ui,sans-serif;
+  font-size:16px;line-height:1.55;padding:0 16px 64px}
+.bekas{max-width:560px;margin:0 auto}
+.kepala{padding:22px 0 16px;border-bottom:2px solid var(--dakwat);margin-bottom:22px}
+.kepala .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--lejar)}
+.kepala h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:29px;
+  line-height:1.05;letter-spacing:-.02em;margin-top:4px}
+.kepala h1 em{font-style:normal;color:var(--lejar)}
+
+.kad{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:18px;margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--dakwat-lembut)}
+input{width:100%;padding:12px;font-size:16px;font-family:inherit;color:var(--dakwat);
+  background:#fff;border:1.5px solid var(--garis);border-radius:3px;margin-bottom:14px}
+input:focus,button:focus-visible{outline:3px solid var(--syiling);outline-offset:1px}
+button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
+.btn{width:100%;padding:14px;background:var(--lejar);color:#fff;border:none;font-weight:600}
+.btn:hover{background:#255740}
+.btn-luar{background:transparent;color:var(--lejar);border:1.5px solid var(--lejar)}
+.btn-luar:hover{background:rgba(47,107,79,.08)}
+.pautan{background:none;border:none;color:var(--lejar);text-decoration:underline;font-size:13px;padding:0}
+
+.negeri{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--lejar);border-bottom:1.5px solid var(--garis);padding-bottom:5px;margin:22px 0 10px}
+.kertas{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:15px;margin-bottom:10px}
+.kertas-tajuk{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em}
+.kertas-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--dakwat-lembut);margin:3px 0 12px}
+.kertas-butang{display:flex;gap:8px}
+.kertas-butang button{flex:1;padding:10px;font-size:14px;font-weight:600}
+.lencana{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+  color:#fff;background:var(--lejar);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:2px}
+
+.bar-atas{position:sticky;top:0;background:var(--kertas);padding:12px 0;z-index:5;
+  border-bottom:1.5px solid var(--garis);margin-bottom:18px}
+.bar-info{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;
+  font-size:12px;color:var(--dakwat-lembut);margin-bottom:8px}
+.masa-suntuk{color:var(--pen);font-weight:700}
+.bar-luar{height:5px;background:var(--garis);border-radius:99px;overflow:hidden}
+.bar-dalam{height:100%;background:var(--lejar);width:0;transition:width .25s ease}
+
+.tag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--lejar);margin-bottom:8px}
+.soalan{font-size:18.5px;font-weight:600;line-height:1.4;margin-bottom:16px;
+  font-family:'Bricolage Grotesque',sans-serif}
+.rangsangan{border:1.5px solid var(--garis);background:var(--kad);padding:13px;margin-bottom:18px;font-size:14.5px}
+.rangsangan ul{margin:0;padding-left:18px}
+.rangsangan table{width:100%;border-collapse:collapse;font-size:13px}
+.rangsangan th,.rangsangan td{border:1px solid var(--garis);padding:5px 6px;text-align:left}
+.rangsangan th{background:rgba(47,107,79,.1);font-weight:600}
+.rangsangan .num{text-align:right;font-family:'Space Mono',monospace}
+.aliran{display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;font-size:13.5px}
+.aliran div{border:1px solid var(--garis);background:#fff;padding:7px 9px;width:100%}
+.aliran .anak{border:none;background:none;color:var(--lejar);padding:0;font-weight:700}
+.aliran .kotak-r{border:2px solid var(--pen);font-weight:700;color:var(--pen)}
+
+.pilihan{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.pil{display:flex;gap:12px;align-items:flex-start;width:100%;padding:13px;text-align:left;
+  background:var(--kad);border:1.5px solid var(--garis);color:var(--dakwat);font-size:15.5px;line-height:1.4}
+.pil:hover{border-color:var(--lejar)}
+.pil .huruf{font-family:'Space Mono',monospace;font-weight:700;color:var(--lejar);flex:none}
+.pil .isi{flex:1}
+.pil .isi small{display:block;color:var(--dakwat-lembut);font-size:13px}
+.pil.dipilih{border-color:var(--lejar);border-width:2px;background:rgba(47,107,79,.09)}
+.pil.betul{border-color:var(--lejar);border-width:2px;background:rgba(47,107,79,.14)}
+.pil.salah{border-color:var(--pen);border-width:2px;background:rgba(195,59,46,.1)}
+.pil.mati{pointer-events:none}
+
+.rasional{border-left:3px solid var(--syiling);padding:10px 12px;background:rgba(216,163,43,.1);
+  font-size:14.5px;margin-bottom:18px}
+.rasional strong{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;display:block;margin-bottom:3px}
+
+.resit{background:#FFFDF7;border:1px solid var(--garis);padding:24px 20px 30px;margin-bottom:16px;
+  font-family:'Space Mono',monospace;font-size:13px;position:relative}
+.resit::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;background:#FFFDF7;
+  -webkit-mask:repeating-linear-gradient(135deg,#000 0 8px,transparent 8px 16px);
+  mask:repeating-linear-gradient(135deg,#000 0 8px,transparent 8px 16px)}
+.resit-tajuk{text-align:center;border-bottom:1px dashed var(--dakwat);padding-bottom:12px;margin-bottom:12px}
+.resit-tajuk .nama{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:800}
+.resit-tajuk .kecil{font-size:11px;color:var(--dakwat-lembut);margin-top:3px}
+.baris{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
+.baris span:last-child{white-space:nowrap}
+.resit-jumlah{border-top:1px dashed var(--dakwat);margin-top:12px;padding-top:12px}
+.markah-besar{font-family:'Bricolage Grotesque',sans-serif;font-size:52px;font-weight:800;
+  line-height:1;text-align:center;letter-spacing:-.03em;margin:6px 0}
+.gred{text-align:center;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lejar)}
+.status-hantar{text-align:center;font-size:11px;color:var(--dakwat-lembut);margin-top:14px;
+  border-top:1px dashed var(--garis);padding-top:10px}
+
+.carta{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:14px;margin-bottom:14px}
+.carta svg{width:100%;height:auto;display:block}
+.rekod-baris{display:flex;justify-content:space-between;align-items:center;
+  padding:11px 2px;border-bottom:1px solid var(--garis);font-size:14px}
+.rekod-baris .tarikh{font-family:'Space Mono',monospace;font-size:12px;color:var(--dakwat-lembut)}
+.rekod-baris .peratus{font-family:'Space Mono',monospace;font-weight:700}
+.kosong{text-align:center;padding:28px 12px;color:var(--dakwat-lembut);font-size:14.5px}
+.tajuk-bhg{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;
+  margin:24px 0 10px;letter-spacing:-.01em}
+.nota{font-size:13px;color:var(--dakwat-lembut);margin-bottom:14px}
+.jarak{height:10px}
+.tersembunyi{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<script>
+  /* ===== TETAPAN CIKGU =====
+     Tampal URL Apps Script (Web App) di antara tanda petik. Rujuk PANDUAN.md */
+  const ENDPOINT_CIKGU = "";
+  const NAMA_SEKOLAH   = "Perniagaan 3766/1";
+
+  /* SESI — tukar nilai ini untuk mengosongkan rekod semua murid.
+     Contoh: "2025/2026" → "2026/2027". Rujuk PANDUAN.md */
+  const SESI = "2025/2026";
+
+  /* Set soalan didaftarkan oleh fail dalam folder soalan/ */
+  const SENARAI_SET = [];
+  function daftarSet(set){ SENARAI_SET.push(set); }
+</script>
+
+<!-- ===== SET SOALAN — tambah satu baris untuk setiap negeri baharu ===== -->
+<script src="soalan/trg-mpp3-2025.js"></script>
+
+</head>
+<body>
+<div class="bekas">
+
+  <header class="kepala">
+    <div class="eyebrow">Kertas 1 &middot; Objektif SPM</div>
+    <h1>Bank <em>Kertas Percubaan</em><br>Perniagaan</h1>
+  </header>
+
+  <section id="skrin-daftar">
+    <div class="kad">
+      <label for="in-nama">Nama penuh</label>
+      <input id="in-nama" type="text" autocomplete="name" placeholder="Contoh: Nurul Aisyah binti Rahim">
+      <label for="in-kelas">Kelas</label>
+      <input id="in-kelas" type="text" placeholder="Contoh: 5 Amanah">
+      <button class="btn" id="btn-daftar">Mula</button>
+    </div>
+    <p class="nota">Nama dan kelas digunakan untuk merekod markah kepada cikgu.</p>
+  </section>
+
+  <section id="skrin-menu" class="tersembunyi">
+    <div class="kad">
+      <div class="baris" style="font-family:'Instrument Sans',sans-serif;font-size:14px;align-items:center">
+        <span id="papar-murid"></span>
+        <button class="pautan" id="btn-tukar-murid">Tukar</button>
+      </div>
+    </div>
+    <button class="btn btn-luar" id="btn-rekod">Lihat perkembangan markah saya</button>
+    <p class="nota" style="margin-top:12px">Ulang mana-mana kertas seberapa banyak kali yang anda mahu. Setiap cubaan direkod supaya anda nampak markah naik dari kali ke kali.</p>
+    <div id="senarai-kertas"></div>
+  </section>
+
+  <section id="skrin-kuiz" class="tersembunyi">
+    <div class="bar-atas">
+      <div class="bar-info"><span id="kira-soalan"></span><span id="papar-masa"></span></div>
+      <div class="bar-luar"><div class="bar-dalam" id="bar-dalam"></div></div>
+    </div>
+    <div class="tag" id="tag-soalan"></div>
+    <p class="soalan" id="teks-soalan"></p>
+    <div id="kotak-rangsangan"></div>
+    <div class="pilihan" id="pilihan"></div>
+    <div id="kotak-rasional"></div>
+    <button class="btn tersembunyi" id="btn-seterus">Seterusnya</button>
+  </section>
+
+  <section id="skrin-slip" class="tersembunyi">
+    <div class="resit" id="resit"></div>
+    <div class="jarak"></div>
+    <button class="btn" id="btn-semak-salah">Semak jawapan yang salah</button>
+    <div class="jarak"></div>
+    <button class="btn btn-luar" id="btn-balik-menu">Kembali ke senarai kertas</button>
+  </section>
+
+  <section id="skrin-semak" class="tersembunyi">
+    <h2 class="tajuk-bhg">Semakan</h2>
+    <div id="senarai-semak"></div>
+    <div class="jarak"></div>
+    <button class="btn btn-luar" id="btn-semak-balik">Kembali ke senarai kertas</button>
+  </section>
+
+  <section id="skrin-rekod" class="tersembunyi">
+    <h2 class="tajuk-bhg">Perkembangan markah</h2>
+    <div id="kandungan-rekod"></div>
+    <div class="jarak"></div>
+    <button class="btn btn-luar" id="btn-rekod-balik">Kembali ke senarai kertas</button>
+  </section>
+
+</div>
+
+<script>
+const Simpan = (()=>{
+  let ok=true, memori={};
+  try{ localStorage.setItem("__uji","1"); localStorage.removeItem("__uji"); }catch(e){ ok=false; }
+  return {
+    baca:k=>{ try{ return ok ? localStorage.getItem(k) : (memori[k]??null); }catch(e){ return memori[k]??null; } },
+    tulis:(k,v)=>{ try{ if(ok) localStorage.setItem(k,v); else memori[k]=v; }catch(e){ memori[k]=v; } },
+    kekal:ok };
+})();
+const KUNCI_MURID="pk1_murid", KUNCI_REKOD="pk1_rekod";
+const $ = id => document.getElementById(id);
+const HURUF = ["A","B","C","D"];
+const SKRIN = ["skrin-daftar","skrin-menu","skrin-kuiz","skrin-slip","skrin-semak","skrin-rekod"];
+function tunjuk(id){ SKRIN.forEach(s=>$(s).classList.toggle("tersembunyi", s!==id)); window.scrollTo(0,0); }
+
+let murid=null, setAktif=null, soalan=[], indeks=0, jawapanMurid=[], modUjian=false, pemasa=null, bakiSaat=0;
+
+/* ---------- murid ---------- */
+function muat(){
+  const simpanan = Simpan.baca(KUNCI_MURID);
+  if(simpanan){ murid = JSON.parse(simpanan); binaMenu(); tunjuk("skrin-menu"); }
+  else tunjuk("skrin-daftar");
+}
+$("btn-daftar").onclick = ()=>{
+  const nama=$("in-nama").value.trim(), kelas=$("in-kelas").value.trim();
+  if(!nama||!kelas){ alert("Isi nama dan kelas dahulu."); return; }
+  murid={nama,kelas}; Simpan.tulis(KUNCI_MURID,JSON.stringify(murid));
+  binaMenu(); tunjuk("skrin-menu");
+};
+$("btn-tukar-murid").onclick = ()=>{
+  Simpan.tulis(KUNCI_MURID,""); murid=null;
+  $("in-nama").value=""; $("in-kelas").value=""; tunjuk("skrin-daftar");
+};
+
+/* ---------- senarai kertas ---------- */
+/* Rekod daripada sesi lama dibuang secara automatik apabila cikgu
+   menukar nilai SESI, supaya kohort baharu bermula dari kosong. */
+function rekodSemua(){
+  const semua = JSON.parse(Simpan.baca(KUNCI_REKOD) || "[]");
+  const sesiIni = semua.filter(r => r.sesi === SESI);
+  if(sesiIni.length !== semua.length) Simpan.tulis(KUNCI_REKOD, JSON.stringify(sesiIni));
+  return sesiIni;
+}
+function rekodSet(idSet){ return rekodSemua().filter(x=>x.idSet===idSet); }
+function markahTerbaik(idSet){
+  const r = rekodSet(idSet);
+  return r.length ? Math.max(...r.map(x=>x.peratus)) : null;
+}
+function binaMenu(){
+  $("papar-murid").textContent = murid.nama + " · " + murid.kelas;
+  const bekas = $("senarai-kertas");
+  if(SENARAI_SET.length===0){
+    bekas.innerHTML = `<div class="kad kosong">Tiada set soalan dimuatkan. Pastikan fail dalam folder <code>soalan/</code> dipautkan dalam index.html.</div>`;
+    return;
+  }
+  const negeri = {};
+  SENARAI_SET.forEach(s=>{ (negeri[s.negeri] = negeri[s.negeri] || []).push(s); });
+  let html = "";
+  Object.keys(negeri).sort().forEach(nama=>{
+    html += `<div class="negeri">${nama}</div>`;
+    negeri[nama].forEach(s=>{
+      const terbaik = markahTerbaik(s.id);
+      const cubaan = rekodSet(s.id).length;
+      const meta = `${s.soalan.length} soalan · ${s.minit} minit`
+        + (cubaan ? ` · ${cubaan} cubaan` : "");
+      html += `<div class="kertas">
+        <div class="kertas-tajuk">${s.nama}${terbaik!==null?`<span class="lencana">Terbaik ${terbaik}%</span>`:""}</div>
+        <div class="kertas-meta">${meta}</div>
+        <div class="kertas-butang">
+          <button class="btn" data-set="${s.id}" data-mod="ujian">${cubaan?"Cuba lagi":"Peperiksaan"}</button>
+          <button class="btn btn-luar" data-set="${s.id}" data-mod="latihan">Latihan</button>
+        </div></div>`;
+    });
+  });
+  bekas.innerHTML = html;
+  bekas.querySelectorAll("button[data-set]").forEach(b=>{
+    b.onclick = ()=> mula(b.dataset.set, b.dataset.mod === "ujian");
+  });
+}
+$("btn-rekod").onclick = ()=>{ binaRekod(); tunjuk("skrin-rekod"); };
+$("btn-rekod-balik").onclick = ()=>{ binaMenu(); tunjuk("skrin-menu"); };
+$("btn-balik-menu").onclick = ()=>{ binaMenu(); tunjuk("skrin-menu"); };
+$("btn-semak-balik").onclick = ()=>{ binaMenu(); tunjuk("skrin-menu"); };
+
+/* ---------- kuiz ---------- */
+function mula(idSet, ujian){
+  setAktif = SENARAI_SET.find(s=>s.id===idSet);
+  soalan = [...setAktif.soalan];
+  indeks=0; jawapanMurid=[]; modUjian=ujian;
+  clearInterval(pemasa);
+  if(ujian){ bakiSaat = setAktif.minit*60; pemasa=setInterval(detik,1000); paparMasa(); }
+  else { $("papar-masa").textContent="Mod latihan"; $("papar-masa").classList.remove("masa-suntuk"); }
+  tunjuk("skrin-kuiz"); paparSoalan();
+}
+function detik(){ bakiSaat--; paparMasa(); if(bakiSaat<=0){ clearInterval(pemasa); tamat(); } }
+function paparMasa(){
+  const m=String(Math.floor(bakiSaat/60)).padStart(2,"0"), s=String(bakiSaat%60).padStart(2,"0");
+  $("papar-masa").textContent = m+":"+s;
+  $("papar-masa").classList.toggle("masa-suntuk", bakiSaat<=300);
+}
+function paparSoalan(){
+  const q = soalan[indeks];
+  $("kira-soalan").textContent = `Soalan ${indeks+1} / ${soalan.length}`;
+  $("bar-dalam").style.width = (indeks/soalan.length*100)+"%";
+  $("tag-soalan").textContent = `${setAktif.negeri} ${setAktif.nama} · No. ${q.no}`;
+  $("teks-soalan").textContent = q.s;
+  $("kotak-rangsangan").innerHTML = q.st ? `<div class="rangsangan">${q.st}</div>` : "";
+  $("kotak-rasional").innerHTML = "";
+  $("btn-seterus").classList.add("tersembunyi");
+  const kotak = $("pilihan"); kotak.innerHTML = "";
+  q.p.forEach((teks,i)=>{
+    const b=document.createElement("button");
+    b.className="pil";
+    b.innerHTML = `<span class="huruf">${HURUF[i]}</span><span class="isi">${teks}</span>`;
+    b.onclick = ()=> pilih(i);
+    kotak.appendChild(b);
+  });
+}
+function pilih(i){
+  const q = soalan[indeks];
+  jawapanMurid[indeks] = i;
+  const butang = [...$("pilihan").children];
+  if(modUjian){
+    butang.forEach((b,n)=> b.classList.toggle("dipilih", n===i));
+    $("btn-seterus").classList.remove("tersembunyi");
+    $("btn-seterus").textContent = (indeks===soalan.length-1) ? "Hantar jawapan" : "Seterusnya";
+  } else {
+    butang.forEach((b,n)=>{
+      b.classList.add("mati");
+      if(n===q.j) b.classList.add("betul");
+      else if(n===i) b.classList.add("salah");
+    });
+    $("kotak-rasional").innerHTML =
+      `<div class="rasional"><strong>${i===q.j?"Betul":"Jawapan: "+HURUF[q.j]}</strong>${q.r}</div>`;
+    $("btn-seterus").classList.remove("tersembunyi");
+    $("btn-seterus").textContent = (indeks===soalan.length-1) ? "Lihat keputusan" : "Soalan seterusnya";
+  }
+}
+$("btn-seterus").onclick = ()=>{
+  if(indeks < soalan.length-1){ indeks++; paparSoalan(); }
+  else { clearInterval(pemasa); tamat(); }
+};
+
+/* ---------- keputusan ---------- */
+function tamat(){
+  let betul=0; const salahNo=[];
+  soalan.forEach((q,n)=>{ if(jawapanMurid[n]===q.j) betul++; else salahNo.push(q.no); });
+  const peratus = Math.round(betul/soalan.length*100);
+  const lepas = rekodSet(setAktif.id);
+  const rekod = {tarikh:new Date().toISOString(), sesi:SESI, nama:murid.nama, kelas:murid.kelas,
+    idSet:setAktif.id, negeri:setAktif.negeri, namaSet:setAktif.nama,
+    mod:modUjian?"Peperiksaan":"Latihan", cubaanKe:lepas.length+1,
+    terbaikSebelum: lepas.length ? Math.max(...lepas.map(x=>x.peratus)) : null,
+    betul, jumlah:soalan.length, peratus, salahNo};
+  const semua = rekodSemua(); semua.push(rekod);
+  Simpan.tulis(KUNCI_REKOD, JSON.stringify(semua.slice(-80)));
+  binaResit(rekod); hantarKeCikgu(rekod); tunjuk("skrin-slip");
+}
+function gred(p){
+  if(p>=80) return "Cemerlang";
+  if(p>=65) return "Baik";
+  if(p>=50) return "Memuaskan";
+  return "Perlu ulang kaji";
+}
+function binaResit(r){
+  const t = new Date(r.tarikh);
+  const tarikh = t.toLocaleDateString("ms-MY",{day:"2-digit",month:"short",year:"numeric"})
+    + " · " + t.toLocaleTimeString("ms-MY",{hour:"2-digit",minute:"2-digit"});
+  let banding = "";
+  if(r.terbaikSebelum !== null){
+    const beza = r.peratus - r.terbaikSebelum;
+    const arah = beza > 0 ? "+"+beza+"% lebih baik" : (beza === 0 ? "sama" : beza+"%");
+    banding = `<div class="baris"><span>Terbaik sebelum ini</span><span>${r.terbaikSebelum}%</span></div>
+               <div class="baris"><span>Perubahan</span><span>${arah}</span></div>`;
+  }
+  $("resit").innerHTML = `
+    <div class="resit-tajuk">
+      <div class="nama">SLIP KEPUTUSAN</div>
+      <div class="kecil">${NAMA_SEKOLAH} · ${r.negeri} ${r.namaSet}</div>
+    </div>
+    <div class="baris"><span>Nama</span><span>${r.nama}</span></div>
+    <div class="baris"><span>Kelas</span><span>${r.kelas}</span></div>
+    <div class="baris"><span>Mod</span><span>${r.mod}</span></div>
+    <div class="baris"><span>Cubaan</span><span>Kali ke-${r.cubaanKe}</span></div>
+    <div class="baris"><span>Tarikh</span><span>${tarikh}</span></div>
+    <div style="border-top:1px dashed var(--dakwat);margin:12px 0 8px"></div>
+    <div class="baris"><span>Jawapan betul</span><span>${r.betul} / ${r.jumlah}</span></div>
+    ${banding}
+    <div class="baris"><span>Soalan salah</span><span>${r.salahNo.length ? r.salahNo.join(", ") : "Tiada"}</span></div>
+    <div class="resit-jumlah">
+      <div class="markah-besar">${r.peratus}%</div>
+      <div class="gred">${gred(r.peratus)}</div>
+    </div>
+    <div class="status-hantar" id="status-hantar">Merekod…</div>`;
+}
+$("btn-semak-salah").onclick = ()=>{
+  const bekas = $("senarai-semak"); bekas.innerHTML = "";
+  const salah = soalan.map((q,n)=>({q,pilihan:jawapanMurid[n]})).filter(x=>x.pilihan!==x.q.j);
+  if(salah.length===0){
+    bekas.innerHTML = `<div class="kad kosong">Semua jawapan betul. Cuba kertas negeri lain pula.</div>`;
+  } else {
+    salah.forEach(({q,pilihan})=>{
+      const d=document.createElement("div"); d.className="kad";
+      d.innerHTML = `<div class="tag">Soalan ${q.no}</div>
+        <p style="font-weight:600;margin-bottom:10px">${q.s}</p>
+        ${q.st ? `<div class="rangsangan">${q.st}</div>` : ""}
+        <div class="baris" style="font-size:14px"><span style="color:var(--pen)">Jawapan anda</span>
+          <span>${pilihan===undefined ? "Tiada" : HURUF[pilihan]}</span></div>
+        <div class="baris" style="font-size:14px"><span style="color:var(--lejar)">Jawapan betul</span>
+          <span>${HURUF[q.j]}</span></div>
+        <div class="rasional" style="margin:12px 0 0"><strong>Rasional</strong>${q.r}</div>`;
+      bekas.appendChild(d);
+    });
+  }
+  tunjuk("skrin-semak");
+};
+
+/* ---------- rekod ---------- */
+function binaRekod(){
+  const semua = rekodSemua();
+  const bekas = $("kandungan-rekod");
+  if(semua.length===0){
+    bekas.innerHTML = `<div class="kad kosong">Belum ada rekod. Selesaikan satu kertas untuk mula membina graf.</div>`;
+    return;
+  }
+  const data = semua.slice(-12), W=320,H=150,pad=26;
+  const x = i => pad + (data.length===1 ? (W-2*pad)/2 : i*(W-2*pad)/(data.length-1));
+  const y = p => H - pad - (p/100)*(H-2*pad);
+  const titik = data.map((d,i)=>`${x(i)},${y(d.peratus)}`).join(" ");
+  const bulat = data.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.peratus)}" r="3.5" fill="#2F6B4F"/>`).join("");
+  const rujuk = [0,50,100].map(v=>
+    `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#C6D2BC" stroke-width="1" ${v===50?'stroke-dasharray="3 3"':''}/>
+     <text x="4" y="${y(v)+4}" font-family="Space Mono, monospace" font-size="9" fill="#5A6B5F">${v}</text>`).join("");
+  const purata = Math.round(semua.reduce((a,b)=>a+b.peratus,0)/semua.length);
+  const terbaik = Math.max(...semua.map(d=>d.peratus));
+  let ringkasan = "";
+  const kumpul = {};
+  semua.forEach(d=>{ (kumpul[d.idSet] = kumpul[d.idSet] || []).push(d); });
+  Object.keys(kumpul).forEach(id=>{
+    const r = kumpul[id], tinggi = Math.max(...r.map(x=>x.peratus));
+    ringkasan += `<div class="rekod-baris">
+      <span>${r[0].negeri} ${r[0].namaSet}<br><span class="tarikh">${r.length} cubaan · terkini ${r[r.length-1].peratus}%</span></span>
+      <span class="peratus">${tinggi}%</span></div>`;
+  });
+
+  let senarai = "";
+  [...semua].reverse().forEach(d=>{
+    const t = new Date(d.tarikh);
+    senarai += `<div class="rekod-baris">
+      <span>${d.negeri} ${d.namaSet}<br><span class="tarikh">${t.toLocaleDateString("ms-MY",{day:"2-digit",month:"short"})} · ${d.mod}</span></span>
+      <span class="peratus">${d.peratus}%</span></div>`;
+  });
+  bekas.innerHTML = `
+    <div class="carta">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Graf peratus markah mengikut percubaan">
+        ${rujuk}
+        <polyline points="${titik}" fill="none" stroke="#2F6B4F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${bulat}
+      </svg>
+      <p class="nota" style="margin:8px 0 0;text-align:center">12 percubaan terakhir</p>
+    </div>
+    <div class="kad" style="font-family:'Space Mono',monospace;font-size:13px">
+      <div class="baris"><span>Jumlah percubaan</span><span>${semua.length}</span></div>
+      <div class="baris"><span>Purata markah</span><span>${purata}%</span></div>
+      <div class="baris"><span>Markah tertinggi</span><span>${terbaik}%</span></div>
+    </div>
+    <h2 class="tajuk-bhg">Ringkasan setiap kertas</h2>
+    ${ringkasan}
+    <h2 class="tajuk-bhg">Senarai percubaan</h2>
+    ${senarai}
+    ${Simpan.kekal ? "" : '<p class="nota" style="margin-top:12px">Peranti ini tidak membenarkan simpanan kekal, jadi rekod hilang apabila halaman ditutup.</p>'}
+    <div class="jarak"></div>
+    <button class="btn btn-luar" id="btn-padam" style="border-color:var(--pen);color:var(--pen)">Padam semua rekod pada peranti ini</button>
+    <p class="nota" style="margin-top:8px">Guna butang ini jika telefon dikongsi dengan murid lain. Rekod dalam Google Sheet cikgu tidak terjejas.</p>`;
+  $("btn-padam").onclick = ()=>{
+    if(confirm("Padam semua rekod dan graf pada peranti ini? Tindakan ini tidak boleh dibatalkan.")){
+      Simpan.tulis(KUNCI_REKOD,"[]");
+      binaRekod();
+    }
+  };
+}
+
+/* ---------- hantar ke cikgu ---------- */
+function hantarKeCikgu(r){
+  const status = $("status-hantar");
+  if(!ENDPOINT_CIKGU){ status.textContent = "Rekod disimpan pada peranti ini sahaja"; return; }
+  fetch(ENDPOINT_CIKGU,{
+    method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({tarikh:r.tarikh,sesi:r.sesi,nama:r.nama,kelas:r.kelas,negeri:r.negeri,
+      set:r.namaSet,mod:r.mod,cubaanKe:r.cubaanKe,betul:r.betul,jumlah:r.jumlah,
+      peratus:r.peratus,salah:r.salahNo.join(", ")})
+  })
+  .then(()=> status.textContent = "Markah telah dihantar kepada cikgu")
+  .catch(()=> status.textContent = "Gagal menghantar. Semak sambungan internet, markah kekal pada peranti ini.");
+}
+
+muat();
+</script>
+</body>
+</html>
