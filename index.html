@@ -129,6 +129,18 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:8px}
 .nota{font-size:13px;color:var(--dakwat-lembut);margin-bottom:14px}
 .jarak{height:10px}
 .tersembunyi{display:none}
+
+@media (min-width:820px){
+  body{padding:0 40px 64px}
+  .bekas{max-width:1140px}
+  .kepala,#skrin-daftar .kad,#skrin-menu>.kad,#btn-rekod,#skrin-menu>.nota,
+  #skrin-kuiz,#skrin-slip,#skrin-semak,#skrin-rekod{max-width:640px;margin-left:auto;margin-right:auto}
+  .bar-atas{max-width:640px;margin-left:auto;margin-right:auto}
+  #senarai-kertas{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:start}
+  #senarai-kertas .negeri{grid-column:1/-1;margin-top:8px}
+  #senarai-kertas .kertas{margin-bottom:0;height:100%;display:flex;flex-direction:column}
+  #senarai-kertas .kertas-butang{margin-top:auto}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
