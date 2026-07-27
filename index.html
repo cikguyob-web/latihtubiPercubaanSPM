@@ -98,6 +98,9 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
 .resit-tajuk .kecil{font-size:11px;color:var(--dakwat-lembut);margin-top:3px}
 .baris{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
 .baris span:last-child{white-space:nowrap}
+.baris-tindan{padding:6px 0}
+.baris-tindan .label{color:var(--dakwat-lembut);margin-bottom:5px}
+.baris-tindan .nilai{line-height:1.7;word-spacing:1px}
 .resit-jumlah{border-top:1px dashed var(--dakwat);margin-top:12px;padding-top:12px}
 .markah-besar{font-family:'Bricolage Grotesque',sans-serif;font-size:52px;font-weight:800;
   line-height:1;text-align:center;letter-spacing:-.03em;margin:6px 0}
@@ -401,7 +404,7 @@ function binaResit(r){
     <div style="border-top:1px dashed var(--dakwat);margin:12px 0 8px"></div>
     <div class="baris"><span>Jawapan betul</span><span>${r.betul} / ${r.jumlah}</span></div>
     ${banding}
-    <div class="baris"><span>Soalan salah</span><span>${r.salahNo.length ? r.salahNo.join(", ") : "Tiada"}</span></div>
+    <div class="baris-tindan"><div class="label">Soalan salah</div><div class="nilai">${r.salahNo.length ? r.salahNo.join(", ") : "Tiada"}</div></div>
     <div class="resit-jumlah">
       <div class="tag" style="margin-bottom:2px;text-align:center">Wajaran SPM</div>
       <div class="markah-besar">${r.wajaranSpm}%</div>
