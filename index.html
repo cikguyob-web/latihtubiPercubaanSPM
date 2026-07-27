@@ -40,14 +40,18 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:8px}
 .pautan{background:none;border:none;color:var(--lejar);text-decoration:underline;font-size:13px;padding:0}
 
 .negeri{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  color:#fff;background:var(--lejar);display:inline-block;border-radius:99px;padding:4px 12px;
+  color:#fff;background:var(--aksen,var(--lejar));display:inline-block;border-radius:99px;padding:4px 12px;
   border-bottom:none;margin:22px 0 10px}
-.kertas{background:var(--kad);border:1.5px solid var(--garis);border-radius:12px;padding:15px;margin-bottom:10px;
-  box-shadow:0 2px 10px rgba(108,76,224,.06)}
+.kertas{background:var(--kad);border:1.5px solid var(--garis);border-left:4px solid var(--aksen,var(--lejar));
+  border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 10px rgba(20,20,40,.05)}
 .kertas-tajuk{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em}
 .kertas-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--dakwat-lembut);margin:3px 0 12px}
 .kertas-butang{display:flex;gap:8px}
 .kertas-butang button{flex:1;padding:10px;font-size:14px;font-weight:600}
+.kertas-butang .btn{background:var(--aksen,var(--lejar))}
+.kertas-butang .btn:hover{filter:brightness(.92)}
+.kertas-butang .btn-luar{color:var(--aksen,var(--lejar));border-color:var(--aksen,var(--lejar))}
+.kertas-butang .btn-luar:hover{background:rgba(20,20,40,.05)}
 .lencana{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
   color:#fff;background:var(--betul);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:2px}
 
@@ -137,7 +141,7 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:8px}
   #skrin-kuiz,#skrin-slip,#skrin-semak,#skrin-rekod{max-width:640px;margin-left:auto;margin-right:auto}
   .bar-atas{max-width:640px;margin-left:auto;margin-right:auto}
   #senarai-kertas{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:start}
-  #senarai-kertas .negeri{grid-column:1/-1;margin-top:8px}
+  #senarai-kertas .negeri{grid-column:1/-1;justify-self:start;margin-top:8px}
   #senarai-kertas .kertas{margin-bottom:0;height:100%;display:flex;flex-direction:column}
   #senarai-kertas .kertas-butang{margin-top:auto}
 }
@@ -295,15 +299,17 @@ function binaMenu(){
   }
   const negeri = {};
   SENARAI_SET.forEach(s=>{ (negeri[s.negeri] = negeri[s.negeri] || []).push(s); });
-  let html = "";
+  const PALET_NEGERI = ["#6C4CE0","#0EA88F","#F2994A","#3D7BFF","#E1568A","#D8A32B"];
+  let html = "", warnaIndeks = 0;
   Object.keys(negeri).sort().forEach(nama=>{
-    html += `<div class="negeri">${nama}</div>`;
+    const aksen = PALET_NEGERI[warnaIndeks % PALET_NEGERI.length]; warnaIndeks++;
+    html += `<div class="negeri" style="--aksen:${aksen}">${nama}</div>`;
     negeri[nama].forEach(s=>{
       const terbaik = markahTerbaik(s.id);
       const cubaan = rekodSet(s.id).length;
       const meta = `${s.soalan.length} soalan · ${s.minit} minit`
         + (cubaan ? ` · ${cubaan} cubaan` : "");
-      html += `<div class="kertas">
+      html += `<div class="kertas" style="--aksen:${aksen}">
         <div class="kertas-tajuk">${s.nama}${terbaik!==null?`<span class="lencana">Terbaik ${terbaik}%</span>`:""}</div>
         <div class="kertas-meta">${meta}</div>
         <div class="kertas-butang">
