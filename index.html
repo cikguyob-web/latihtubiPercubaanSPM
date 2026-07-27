@@ -9,13 +9,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --kertas:#E9EEE3;--kad:#F8FAF4;--dakwat:#1B2A21;--dakwat-lembut:#5A6B5F;
-  --garis:#C6D2BC;--lejar:#2F6B4F;--pen:#C33B2E;--syiling:#D8A32B;
+  --kertas:#FFF6EC;--kad:#FFFFFF;--dakwat:#2A2550;--dakwat-lembut:#79709A;
+  --garis:#EBE0FA;--lejar:#6C4CE0;--pen:#FF5C5C;--syiling:#FFB627;--betul:#16A672;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{background:var(--kertas);
-  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,rgba(47,107,79,.07) 31px 32px);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,rgba(108,76,224,.055) 31px 32px);
   color:var(--dakwat);font-family:'Instrument Sans',system-ui,sans-serif;
   font-size:16px;line-height:1.55;padding:0 16px 64px}
 .bekas{max-width:560px;margin:0 auto}
@@ -26,27 +26,30 @@ body{background:var(--kertas);
   line-height:1.05;letter-spacing:-.02em;margin-top:4px}
 .kepala h1 em{font-style:normal;color:var(--lejar)}
 
-.kad{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:18px;margin-bottom:14px}
+.kad{background:var(--kad);border:1.5px solid var(--garis);border-radius:12px;padding:18px;margin-bottom:14px;
+  box-shadow:0 2px 10px rgba(108,76,224,.06)}
 label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--dakwat-lembut)}
 input{width:100%;padding:12px;font-size:16px;font-family:inherit;color:var(--dakwat);
-  background:#fff;border:1.5px solid var(--garis);border-radius:3px;margin-bottom:14px}
+  background:#fff;border:1.5px solid var(--garis);border-radius:8px;margin-bottom:14px}
 input:focus,button:focus-visible{outline:3px solid var(--syiling);outline-offset:1px}
-button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
+button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:8px}
 .btn{width:100%;padding:14px;background:var(--lejar);color:#fff;border:none;font-weight:600}
-.btn:hover{background:#255740}
+.btn:hover{background:#5638C4}
 .btn-luar{background:transparent;color:var(--lejar);border:1.5px solid var(--lejar)}
-.btn-luar:hover{background:rgba(47,107,79,.08)}
+.btn-luar:hover{background:rgba(108,76,224,.08)}
 .pautan{background:none;border:none;color:var(--lejar);text-decoration:underline;font-size:13px;padding:0}
 
 .negeri{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--lejar);border-bottom:1.5px solid var(--garis);padding-bottom:5px;margin:22px 0 10px}
-.kertas{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:15px;margin-bottom:10px}
+  color:#fff;background:var(--lejar);display:inline-block;border-radius:99px;padding:4px 12px;
+  border-bottom:none;margin:22px 0 10px}
+.kertas{background:var(--kad);border:1.5px solid var(--garis);border-radius:12px;padding:15px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(108,76,224,.06)}
 .kertas-tajuk{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em}
 .kertas-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--dakwat-lembut);margin:3px 0 12px}
 .kertas-butang{display:flex;gap:8px}
 .kertas-butang button{flex:1;padding:10px;font-size:14px;font-weight:600}
 .lencana{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
-  color:#fff;background:var(--lejar);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:2px}
+  color:#fff;background:var(--betul);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:2px}
 
 .bar-atas{position:sticky;top:0;background:var(--kertas);padding:12px 0;z-index:5;
   border-bottom:1.5px solid var(--garis);margin-bottom:18px}
@@ -64,7 +67,7 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
 .rangsangan ul{margin:0;padding-left:18px}
 .rangsangan table{width:100%;border-collapse:collapse;font-size:13px}
 .rangsangan th,.rangsangan td{border:1px solid var(--garis);padding:5px 6px;text-align:left}
-.rangsangan th{background:rgba(47,107,79,.1);font-weight:600}
+.rangsangan th{background:rgba(108,76,224,.1);font-weight:600}
 .rangsangan .num{text-align:right;font-family:'Space Mono',monospace}
 .aliran{display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;font-size:13.5px}
 .aliran div{border:1px solid var(--garis);background:#fff;padding:7px 9px;width:100%}
@@ -73,22 +76,24 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
 
 .pilihan{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
 .pil{display:flex;gap:12px;align-items:flex-start;width:100%;padding:13px;text-align:left;
-  background:var(--kad);border:1.5px solid var(--garis);color:var(--dakwat);font-size:15.5px;line-height:1.4}
+  background:var(--kad);border:1.5px solid var(--garis);color:var(--dakwat);font-size:15.5px;line-height:1.4;
+  border-radius:10px}
 .pil:hover{border-color:var(--lejar)}
 .pil .huruf{font-family:'Space Mono',monospace;font-weight:700;color:var(--lejar);flex:none}
 .pil .isi{flex:1}
 .pil .isi small{display:block;color:var(--dakwat-lembut);font-size:13px}
-.pil.dipilih{border-color:var(--lejar);border-width:2px;background:rgba(47,107,79,.09)}
-.pil.betul{border-color:var(--lejar);border-width:2px;background:rgba(47,107,79,.14)}
-.pil.salah{border-color:var(--pen);border-width:2px;background:rgba(195,59,46,.1)}
+.pil.dipilih{border-color:var(--lejar);border-width:2px;background:rgba(108,76,224,.09)}
+.pil.betul{border-color:var(--betul);border-width:2px;background:rgba(22,166,114,.12)}
+.pil.betul .huruf{color:var(--betul)}
+.pil.salah{border-color:var(--pen);border-width:2px;background:rgba(255,92,92,.1)}
 .pil.mati{pointer-events:none}
 
-.rasional{border-left:3px solid var(--syiling);padding:10px 12px;background:rgba(216,163,43,.1);
+.rasional{border-left:3px solid var(--syiling);border-radius:0 8px 8px 0;padding:10px 12px;background:rgba(255,182,39,.14);
   font-size:14.5px;margin-bottom:18px}
 .rasional strong{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;
-  text-transform:uppercase;display:block;margin-bottom:3px}
+  text-transform:uppercase;display:block;margin-bottom:3px;color:#B5790A}
 
-.resit{background:#FFFDF7;border:1px solid var(--garis);padding:24px 20px 30px;margin-bottom:16px;
+.resit{background:#FFFDF7;border:1px solid var(--garis);border-radius:12px 12px 0 0;padding:24px 20px 30px;margin-bottom:16px;
   font-family:'Space Mono',monospace;font-size:13px;position:relative}
 .resit::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;background:#FFFDF7;
   -webkit-mask:repeating-linear-gradient(135deg,#000 0 8px,transparent 8px 16px);
@@ -104,11 +109,15 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
 .resit-jumlah{border-top:1px dashed var(--dakwat);margin-top:12px;padding-top:12px}
 .markah-besar{font-family:'Bricolage Grotesque',sans-serif;font-size:52px;font-weight:800;
   line-height:1;text-align:center;letter-spacing:-.03em;margin:6px 0}
-.gred{text-align:center;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lejar)}
+.gred{text-align:center;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:700}
+.gred-cemerlang{color:var(--betul)}
+.gred-baik{color:#3D7BFF}
+.gred-memuaskan{color:#E08900}
+.gred-ulang{color:var(--pen)}
 .status-hantar{text-align:center;font-size:11px;color:var(--dakwat-lembut);margin-top:14px;
   border-top:1px dashed var(--garis);padding-top:10px}
 
-.carta{background:var(--kad);border:1.5px solid var(--garis);border-radius:4px;padding:14px;margin-bottom:14px}
+.carta{background:var(--kad);border:1.5px solid var(--garis);border-radius:12px;padding:14px;margin-bottom:14px}
 .carta svg{width:100%;height:auto;display:block}
 .rekod-baris{display:flex;justify-content:space-between;align-items:center;
   padding:11px 2px;border-bottom:1px solid var(--garis);font-size:14px}
@@ -380,6 +389,12 @@ function gred(p){
   if(p>=50) return "Memuaskan";
   return "Perlu ulang kaji";
 }
+function gredKelas(p){
+  if(p>=80) return "gred-cemerlang";
+  if(p>=65) return "gred-baik";
+  if(p>=50) return "gred-memuaskan";
+  return "gred-ulang";
+}
 function binaResit(r){
   const t = new Date(r.tarikh);
   const tarikh = t.toLocaleDateString("ms-MY",{day:"2-digit",month:"short",year:"numeric"})
@@ -408,7 +423,7 @@ function binaResit(r){
     <div class="resit-jumlah">
       <div class="tag" style="margin-bottom:2px;text-align:center">Wajaran SPM</div>
       <div class="markah-besar">${r.wajaranSpm}%</div>
-      <div class="gred">${gred(r.peratus)}</div>
+      <div class="gred ${gredKelas(r.peratus)}">${gred(r.peratus)}</div>
     </div>
     <div class="status-hantar" id="status-hantar">Merekod…</div>`;
 }
@@ -446,10 +461,10 @@ function binaRekod(){
   const x = i => pad + (data.length===1 ? (W-2*pad)/2 : i*(W-2*pad)/(data.length-1));
   const y = p => H - pad - (p/WAJARAN_K1)*(H-2*pad);
   const titik = data.map((d,i)=>`${x(i)},${y(d.wajaranSpm)}`).join(" ");
-  const bulat = data.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.wajaranSpm)}" r="3.5" fill="#2F6B4F"/>`).join("");
+  const bulat = data.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.wajaranSpm)}" r="4" fill="#6C4CE0"/>`).join("");
   const rujuk = [0,WAJARAN_K1/2,WAJARAN_K1].map(v=>
-    `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#C6D2BC" stroke-width="1" ${v===WAJARAN_K1/2?'stroke-dasharray="3 3"':''}/>
-     <text x="4" y="${y(v)+4}" font-family="Space Mono, monospace" font-size="9" fill="#5A6B5F">${v}</text>`).join("");
+    `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#EBE0FA" stroke-width="1" ${v===WAJARAN_K1/2?'stroke-dasharray="3 3"':''}/>
+     <text x="4" y="${y(v)+4}" font-family="Space Mono, monospace" font-size="9" fill="#79709A">${v}</text>`).join("");
   const purata = Math.round(semua.reduce((a,b)=>a+b.wajaranSpm,0)/semua.length*10)/10;
   const terbaik = Math.max(...semua.map(d=>d.wajaranSpm));
   let ringkasan = "";
@@ -473,7 +488,7 @@ function binaRekod(){
     <div class="carta">
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Graf Wajaran SPM mengikut percubaan">
         ${rujuk}
-        <polyline points="${titik}" fill="none" stroke="#2F6B4F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="${titik}" fill="none" stroke="#6C4CE0" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
         ${bulat}
       </svg>
       <p class="nota" style="margin:8px 0 0;text-align:center">12 percubaan terakhir</p>
