@@ -351,6 +351,24 @@ body {
   <!-- CUSTOM MODALS SYSTEM (Replaces alert and confirm) -->
   <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden transition-opacity flex items-center justify-center p-4">
     
+    <!-- Modal Profil / Log Keluar -->
+    <div id="modal-profil" class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl hidden">
+      <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl mx-auto">
+        👤
+      </div>
+      <div class="text-center">
+        <h3 class="font-heading text-lg font-bold text-slate-900" id="profil-nama">Profil Murid</h3>
+        <p class="text-xs text-slate-500 mt-1" id="profil-kelas">Kelas: -</p>
+      </div>
+      <div class="space-y-2 pt-2">
+        <button onclick="logKeluarSahkan()" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span>Log Keluar</span>
+        </button>
+        <button onclick="tutupModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Batal</button>
+      </div>
+    </div>
+
     <!-- Modal Padam Rekod -->
     <div id="modal-padam" class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl hidden">
       <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl mx-auto">
@@ -395,166 +413,67 @@ body {
 
   </div>
 
+<!-- ===== SET SOALAN — tambah satu baris untuk setiap negeri baharu ===== -->
+<script>
+  window.__SET_SOALAN__ = [];
+  function daftarSet(set){ window.__SET_SOALAN__.push(set); }
+</script>
+<script src="soalan/trg-mpp3-2025.js"></script>
+<script src="soalan/kdh-mppm-2025.js"></script>
+<script src="soalan/sel-ppc-2025.js"></script>
+<script src="soalan/prk-ppc-2025.js"></script>
+<script src="soalan/kl-ppc-2025.js"></script>
+
 <!-- JAVASCRIPT CORE LOGIC -->
 <script>
 
-/* ===== TETAPAN CIKGU ===== */
-const ENDPOINT_CIKGU = "https://script.google.com/macros/s/AKfycbyPkIoTQ-NK2ncncJEq7wLcZNQI39i1El9_mXMZKcX5swSyrDIhCZzbsKeuD-oGzD_Qbg/exec";
-const NAMA_SEKOLAH   = "SMK BIDOR";
-const SESI           = "2025/2026";
-const WAJARAN_K1     = 20; // 20% SPM
+const SESI = "2025/2026";
+const WAJARAN_K1 = 20;
+const NAMA_SEKOLAH = "SMK BIDOR";
+const ENDPOINT_CIKGU = ""; // URL Google Sheets Apps Script Web App (jika ada)
+const KUNCI_MURID = "spm_p1_murid_v1";
+const KUNCI_REKOD = "spm_p1_rekod_v1";
+const HURUF = ["A", "B", "C", "D"];
 
-const KUNCI_MURID = "pk1_murid_v2";
-const KUNCI_REKOD = "pk1_rekod_v2";
-const HURUF       = ["A", "B", "C", "D"];
+// Storage Helper
+const Simpan = {
+  baca(k) {
+    try { return localStorage.getItem(k); } catch (e) { return null; }
+  },
+  tulis(k, v) {
+    try { localStorage.setItem(k, v); } catch (e) {}
+  }
+};
 
-/* Storage Helper */
-const Simpan = (() => {
-  let ok = true, memori = {};
-  try { localStorage.setItem("__uji", "1"); localStorage.removeItem("__uji"); } catch (e) { ok = false; }
-  return {
-    baca: k => { try { return ok ? localStorage.getItem(k) : (memori[k] ?? null); } catch (e) { return memori[k] ?? null; } },
-    tulis: (k, v) => { try { if (ok) localStorage.setItem(k, v); else memori[k] = v; } catch (e) { memori[k] = v; } },
-    kekal: ok
-  };
-})();
-
-/* Dynamic Question Registry */
-const SENARAI_SET = [];
-function daftarSet(set) { SENARAI_SET.push(set); }
-
-/* BUILT-IN SAMPLE SPM QUESTION DATA (Self-contained) */
-daftarSet({
-  id: "prk-ppc-2025",
-  negeri: "Perak",
-  nama: "Percubaan SPM 2025",
-  minit: 15,
-  soalan: [
-    {
-      no: 1,
-      s: "Apakah matlamat utama penubuhan sesebuah organisasi bukan bermotifkan untung (OBBU)?",
-      st: null,
-      p: ["Memaksimalkan keuntungan pemegang saham", "Menjaga kebajikan ahli dan masyarakat", "Meningkatkan syer pasaran perniagaan", "Mendapatkan pinjaman bank dengan mudah"],
-      j: 1,
-      r: "OBBU ditubuhkan khusus untuk menjaga kebajikan ahli atau memberi perkhidmatan kepada masyarakat tanpa mengutamakan keuntungan."
-    },
-    {
-      no: 2,
-      s: "Maklumat berikut merujuk kepada sejenis pemilikan perniagaan. Apakah bentuk pemilikan tersebut?",
-      st: `<div class="bg-indigo-50/70 p-3 rounded-lg border border-indigo-100 text-xs sm:text-sm">
-            <ul class="list-disc pl-4 space-y-1 text-slate-700">
-              <li>Liabiliti pemilik adalah tidak terhad</li>
-              <li>Modal disumbangkan oleh 2 hingga 20 orang rakan kongsi</li>
-            </ul>
-           </div>`,
-      p: ["Milikan Tunggal", "Perkongsian", "Syarikat Berhad", "Koperasi"],
-      j: 1,
-      r: "Perkongsian ditubuhkan oleh sekurang-kurangnya 2 hingga 20 orang pemilik dan rakan kongsi mempunyai liabiliti tidak terhad."
-    },
-    {
-      no: 3,
-      s: "Antara yang berikut, yang manakah merupakan trend persekitaran perniagaan dalam fasa kemerosotan?",
-      st: null,
-      p: ["Permintaan produk meningkat secara mendadak", "Keuntungan perniagaan berada pada tahap maksimum", "Jualan merosot dan syarikat mengalami kerugian", "Perniagaan meluaskan pasaran ke antarabangsa"],
-      j: 2,
-      r: "Fasa kemerosotan ditandai dengan penurunan jualan secara berterusan dan kemerosotan keuntungan."
-    },
-    {
-      no: 4,
-      s: "Apakah peranan bahagian fungsian Pengurusan Sumber Manusia dalam sesebuah organisasi?",
-      st: null,
-      p: ["Menguruskan aliran tunai dan penyata kewangan", "Merancang dan melaksanakan latihan serta pembangunan staf", "Merekabentuk pembungkusan dan iklan produk", "Mengawal mutu bahan mentah di kilang"],
-      j: 1,
-      r: "Fungsian Pengurusan Sumber Manusia bertanggungjawab mengurus perancangan, pengambilan, latihan, dan kebajikan pekerja."
-    }
-  ]
-});
-
-daftarSet({
-  id: "trg-mpp3-2025",
-  negeri: "Terengganu",
-  nama: "MPP3 Percubaan 2025",
-  minit: 15,
-  soalan: [
-    {
-      no: 1,
-      s: "Gambar di bawah berkaitan dengan satu sektor perniagaan. Sektor manakah yang betul?",
-      st: `<div class="p-3 bg-slate-50 border border-slate-200 text-center text-xs text-slate-600 font-mono-code rounded-lg">
-            [Pembalakan & Ekstraksi Minyak Mentah]
-           </div>`,
-      p: ["Sektor Utama (Primer)", "Sektor Kedua (Sekunder)", "Sektor Ketiga (Tersier)", "Sektor Perkhidmatan"],
-      j: 0,
-      r: "Sektor Utama/Primer melibatkan aktiviti pengeluaran bahan mentah terus daripada sumber semula jadi."
-    },
-    {
-      no: 2,
-      s: "Pernyataan yang manakah menggambarkan ciri analisis SWOT bagi 'Peluang' (Opportunities)?",
-      st: null,
-      p: ["Kelemahan dalaman yang boleh diperbaiki syarikat", "Perkembangan luaran yang boleh dimanfaatkan untuk meningkatkan jualan", "Kekuatan jenama di dalam pasaran tempatan", "Ancaman daripada pesaing baharu yang memasuki pasaran"],
-      j: 1,
-      r: "Peluang merupakan faktor luaran positif yang boleh dimanfaatkan oleh perniagaan untuk berkembang."
-    }
-  ]
-});
-
-daftarSet({
-  id: "kdh-mppm-2025",
-  negeri: "Kedah",
-  nama: "MPPM SPM 2025",
-  minit: 15,
-  soalan: [
-    {
-      no: 1,
-      s: "Antara berikut, manakah penyataan yang tepat mengenai Syarikat Sendirian Berhad?",
-      st: null,
-      p: ["Syer boleh dijual bebas di Bursa Malaysia", "Bilangan pemegang syer 1 hingga 50 orang", "Perniagaan diuruskan sepenuhnya oleh Ahli Lembaga Pengarah Koperasi", "Liabiliti pemegang syer adalah tidak terhad"],
-      j: 1,
-      r: "Syarikat Sendirian Berhad mengehadkan bilangan pemegang syer antara 1 hingga 50 orang sahaja."
-    }
-  ]
-});
-
-daftarSet({
-  id: "sel-ppc-2025",
-  negeri: "Selangor",
-  nama: "PPC SPM 2025",
-  minit: 15,
-  soalan: [
-    {
-      no: 1,
-      s: "Apakah kesan inflasi terhadap persekitaran perniagaan?",
-      st: null,
-      p: ["Kuasa beli pengguna meningkat", "Kos pengeluaran dan harga barang meningkat", "Kadar pengangguran meningkat tajam", "Nilai mata wang tempatan mengukuh"],
-      j: 1,
-      r: "Inflasi ialah kenaikan tingkat harga umum barang dan perkhidmatan secara berterusan, menyebabkan kos pengeluaran meningkat."
-    }
-  ]
-});
-
-/* STATE APLIKASI */
+// Global State
 let murid = null;
 let setAktif = null;
 let soalan = [];
 let indeks = 0;
 let jawapanMurid = [];
-let modUjian = false;
+let modUjian = true;
 let pemasa = null;
 let bakiSaat = 0;
 let penapisNegeri = "Semua";
 
+/* Set soalan dimuatkan daripada fail dalam folder soalan/ (lihat pautan di bahagian atas fail). */
+const SENARAI_SET = (window.__SET_SOALAN__ || []);
 
 function muatAplikasi() {
-  document.getElementById("papar-sesi").textContent = SESI;
   const simpanan = Simpan.baca(KUNCI_MURID);
   if (simpanan) {
     try {
       murid = JSON.parse(simpanan);
-      kemaskiniHeaderMurid();
-      binaMenu();
-      tunjukSkrin("skrin-menu");
     } catch (e) {
-      tunjukSkrin("skrin-daftar");
+      murid = null;
     }
+  }
+
+  kemaskiniHeaderMurid();
+
+  if (murid && murid.nama) {
+    tunjukSkrin("skrin-menu");
+    binaMenu();
   } else {
     tunjukSkrin("skrin-daftar");
   }
@@ -564,17 +483,15 @@ function prosesDaftar(e) {
   e.preventDefault();
   const nama = document.getElementById("in-nama").value.trim();
   const kelas = document.getElementById("in-kelas").value.trim();
-  
-  if (!nama || !kelas) {
-    bukaModalAlert("Sila Lengkapkan Maklumat", "Isi nama penuh dan kelas anda sebelum meneruskan.");
-    return;
-  }
+
+  if (!nama || !kelas) return;
 
   murid = { nama, kelas };
   Simpan.tulis(KUNCI_MURID, JSON.stringify(murid));
+
   kemaskiniHeaderMurid();
-  binaMenu();
   tunjukSkrin("skrin-menu");
+  binaMenu();
 }
 
 function kemaskiniHeaderMurid() {
@@ -590,10 +507,15 @@ function kemaskiniHeaderMurid() {
 }
 
 function bukaModalTukarMurid() {
-  bukaModalAlert("Profil Murid", `Berdaftar sebagai: ${murid.nama} (${murid.kelas})`);
+  if (!murid) return;
+  backdrop.classList.remove("hidden");
+  document.getElementById("modal-profil").classList.remove("hidden");
+  document.getElementById("profil-nama").textContent = murid.nama;
+  document.getElementById("profil-kelas").textContent = `Kelas: ${murid.kelas}`;
 }
 
-function tukarMuridSahkan() {
+function logKeluarSahkan() {
+  tutupModal();
   Simpan.tulis(KUNCI_MURID, "");
   murid = null;
   kemaskiniHeaderMurid();
@@ -601,7 +523,6 @@ function tukarMuridSahkan() {
   document.getElementById("in-kelas").value = "";
   tunjukSkrin("skrin-daftar");
 }
-
 
 function rekodSemua() {
   const semua = JSON.parse(Simpan.baca(KUNCI_REKOD) || "[]");
@@ -970,11 +891,30 @@ function binaRekod() {
   const data = semua.slice(-12);
   const W = 320, H = 140, pad = 24;
   const x = i => pad + (data.length === 1 ? (W - 2 * pad) / 2 : i * (W - 2 * pad) / (data.length - 1));
-  const y = p => H - pad - (p / WAJARAN_K1) * (H - 2 * pad);
+  const y = p => H - pad - ((Number(p) || 0) / WAJARAN_K1) * (H - 2 * pad);
 
   const titik = data.map((d, i) => `${x(i)},${y(d.wajaranSpm)}`).join(" ");
-  const bulat = data.map((d, i) => `<circle cx="${x(i)}" cy="${y(d.wajaranSpm)}" r="4" fill="#6366F1"/>`).join("");
-  
+
+  /* Satu titik sahaja tidak boleh membentuk garisan, jadi lukis penanda
+     mendatar supaya murid tetap nampak kedudukan markah pertama mereka. */
+  const garisan = data.length === 1
+    ? `<line x1="${pad}" y1="${y(data[0].wajaranSpm)}" x2="${W - pad}" y2="${y(data[0].wajaranSpm)}"
+             stroke="#6366F1" stroke-width="2.5" stroke-dasharray="5 4" stroke-linecap="round"/>`
+    : `<polyline points="${titik}" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+  const bulat = data.map((d, i) =>
+    `<circle cx="${x(i)}" cy="${y(d.wajaranSpm)}" r="4.5" fill="#6366F1" stroke="#fff" stroke-width="1.5"/>`
+  ).join("");
+
+  /* Label nilai pada titik pertama dan terakhir supaya graf mudah dibaca. */
+  const label = data.map((d, i) => {
+    if (data.length > 1 && i !== 0 && i !== data.length - 1) return "";
+    const atas = y(d.wajaranSpm) > pad + 14;
+    return `<text x="${x(i)}" y="${atas ? y(d.wajaranSpm) - 9 : y(d.wajaranSpm) + 16}"
+                  text-anchor="middle" font-family="Space Mono, monospace" font-size="9"
+                  font-weight="700" fill="#4F46E5">${d.wajaranSpm}%</text>`;
+  }).join("");
+
   const rujuk = [0, WAJARAN_K1 / 2, WAJARAN_K1].map(v =>
     `<line x1="${pad}" y1="${y(v)}" x2="${W - pad}" y2="${y(v)}" stroke="#E2E8F0" stroke-width="1" ${v === WAJARAN_K1 / 2 ? 'stroke-dasharray="3 3"' : ''}/>
      <text x="2" y="${y(v) + 3}" font-family="Space Mono, monospace" font-size="8" fill="#94A3B8">${v}%</text>`
@@ -1003,15 +943,20 @@ function binaRekod() {
     <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
       <div class="flex items-center justify-between">
         <h3 class="font-heading font-bold text-sm text-slate-800">Graf Wajaran SPM (12 Percubaan Terakhir)</h3>
-        <span class="text-xs font-mono-code text-slate-400">Skala 0 - 20%</span>
+        <span class="text-xs font-mono-code text-slate-400">Skala 0 - ${WAJARAN_K1}%</span>
       </div>
       <div class="w-full">
-        <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto overflow-visible">
+        <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto overflow-visible" role="img"
+             aria-label="Graf Wajaran SPM mengikut percubaan">
           ${rujuk}
-          <polyline points="${titik}" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          ${garisan}
           ${bulat}
+          ${label}
         </svg>
       </div>
+      ${data.length === 1
+        ? `<p class="text-[11px] text-slate-400 text-center">Ini cubaan pertama anda. Buat cubaan kedua untuk mula melihat garis perkembangan.</p>`
+        : ""}
     </div>
 
     <!-- Stats Summary Cards -->
