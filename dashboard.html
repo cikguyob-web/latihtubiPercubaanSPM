@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ms" class="h-full bg-slate-50">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Rekod · Bank Kertas 1 Perniagaan</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@0,400;0,500;0,600;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+:root{
+  --kertas:#FFF9F2; --lejar:#6366F1; --lejar-gelap:#4F46E5;
+  --pen:#EF4444; --syiling:#F59E0B; --betul:#10B981;
+}
+body{
+  font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  background-color:var(--kertas);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 31px,rgba(99,102,241,.04) 31px 32px);
+  color:#1E1B4B;
+}
+.font-heading{font-family:'Bricolage Grotesque',sans-serif}
+.font-mono-code{font-family:'Space Mono',monospace}
+.anim-fade{animation:fadeIn .25s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
+</style>
+</head>
+
+<body class="min-h-full flex flex-col antialiased">
+
+  <header class="w-full bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-heading font-extrabold text-lg shadow-md shadow-indigo-200">📊</div>
+        <div>
+          <div class="font-mono-code text-[10px] tracking-widest text-indigo-600 uppercase font-bold">Rekod Guru</div>
+          <h1 class="font-heading font-extrabold text-lg sm:text-xl text-slate-900 leading-none">Dashboard <span class="text-indigo-600">Prestasi</span></h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="hidden sm:inline-flex px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 transition">← Bank Soalan</a>
+        <button onclick="muatData()" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-sm">Muat semula</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
+
+    <div id="status" class="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-500 anim-fade">
+      <div class="inline-block w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3" style="border-width:3px"></div>
+      <p class="text-sm">Memuatkan rekod daripada Google Sheet…</p>
+    </div>
+
+    <div id="kandungan" class="hidden space-y-8">
+
+      <!-- Kad ringkasan -->
+      <section>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="kad-ringkas"></div>
+      </section>
+
+      <!-- Penapis -->
+      <section class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kelas</span>
+            <div id="penapis-kelas" class="flex flex-wrap gap-2"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mod</span>
+            <div id="penapis-mod" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analisis soalan paling salah -->
+      <section class="space-y-3">
+        <div class="flex items-end justify-between gap-3">
+          <div>
+            <h2 class="font-heading text-xl font-extrabold text-slate-900">Soalan Paling Banyak Salah</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Fokus pengajaran pada nombor soalan ini.</p>
+          </div>
+          <select id="pilih-kertas-salah" onchange="binaSoalanSalah()"
+                  class="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-indigo-500"></select>
+        </div>
+        <div id="analisis-salah" class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5"></div>
+      </section>
+
+      <!-- Perbandingan kelas -->
+      <section class="space-y-3">
+        <h2 class="font-heading text-xl font-extrabold text-slate-900">Perbandingan Kelas</h2>
+        <div id="banding-kelas" class="grid sm:grid-cols-2 gap-4"></div>
+      </section>
+
+      <!-- Ringkasan kertas -->
+      <section class="space-y-3">
+        <h2 class="font-heading text-xl font-extrabold text-slate-900">Ringkasan Setiap Kertas</h2>
+        <div id="ringkasan-kertas" class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden"></div>
+      </section>
+
+      <!-- Prestasi murid -->
+      <section class="space-y-3">
+        <div class="flex items-end justify-between gap-3 flex-wrap">
+          <div>
+            <h2 class="font-heading text-xl font-extrabold text-slate-900">Prestasi Setiap Murid</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Klik nama untuk lihat semua cubaan murid itu.</p>
+          </div>
+          <input id="cari-murid" oninput="binaMurid()" type="search" placeholder="Cari nama murid…"
+                 class="text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-indigo-500 w-full sm:w-56">
+        </div>
+        <div id="senarai-murid" class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden"></div>
+      </section>
+
+      <p class="text-[11px] text-center text-slate-400 pt-2" id="nota-kemaskini"></p>
+    </div>
+  </main>
+
+<script>
+/* ===== TETAPAN =====
+   URL CSV terbitan Google Sheet (File → Share → Publish to web → CSV).
+   Tukar jika cikgu menerbitkan helaian baharu. */
+const URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLGNuwPK402iS3T970ZyqKzmFEuPlrBMkvhKCkITsvsJE77MpAH1ablsE07gvxAyea6feWKLCwkRZt/pub?gid=0&single=true&output=csv";
+const WAJARAN_K1 = 20;
+
+let SEMUA = [];
+let penapisKelas = "Semua";
+let penapisMod = "Semua";
+
+/* ---------- Pembaca CSV (mengendali koma dalam petikan) ---------- */
+function bacaCSV(teks) {
+  const baris = [];
+  let medan = "", rekod = [], dalamPetikan = false;
+  for (let i = 0; i < teks.length; i++) {
+    const c = teks[i];
+    if (dalamPetikan) {
+      if (c === '"') {
+        if (teks[i + 1] === '"') { medan += '"'; i++; }
+        else dalamPetikan = false;
+      } else medan += c;
+    } else {
+      if (c === '"') dalamPetikan = true;
+      else if (c === ",") { rekod.push(medan); medan = ""; }
+      else if (c === "\n") { rekod.push(medan); baris.push(rekod); rekod = []; medan = ""; }
+      else if (c !== "\r") medan += c;
+    }
+  }
+  if (medan !== "" || rekod.length) { rekod.push(medan); baris.push(rekod); }
+  return baris.filter(r => r.some(x => String(x).trim() !== ""));
+}
+
+/* Cari indeks lajur secara fleksibel — tahan jika cikgu ubah sedikit nama tajuk. */
+function cariLajur(tajuk, ...kunci) {
+  const norm = tajuk.map(t => String(t).toLowerCase().replace(/[^a-z0-9]/g, ""));
+  for (const k of kunci) {
+    const kk = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const i = norm.findIndex(t => t === kk);
+    if (i !== -1) return i;
+  }
+  for (const k of kunci) {
+    const kk = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const i = norm.findIndex(t => t.includes(kk));
+    if (i !== -1) return i;
+  }
+  return -1;
+}
+
+function nombor(v) {
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ""));
+  return isNaN(n) ? 0 : n;
+}
+
+async function muatData() {
+  const status = document.getElementById("status");
+  const kandungan = document.getElementById("kandungan");
+  status.classList.remove("hidden");
+  kandungan.classList.add("hidden");
+  status.innerHTML = `<div class="inline-block w-8 h-8 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3" style="border-width:3px"></div>
+                      <p class="text-sm">Memuatkan rekod daripada Google Sheet…</p>`;
+
+  try {
+    const res = await fetch(URL_CSV + "&_=" + Date.now());
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const teks = await res.text();
+    prosesCSV(teks);
+  } catch (err) {
+    papatRalat(err);
+  }
+}
+
+/* Papar borang tampal data — jalan keluar apabila fetch disekat
+   (contohnya apabila fail dibuka terus daripada komputer, protokol file://). */
+function papatRalat(err) {
+  const status = document.getElementById("status");
+  const fail = location.protocol === "file:";
+  status.classList.remove("hidden");
+  status.innerHTML = `
+    <div class="text-left max-w-2xl mx-auto space-y-4">
+      <div class="text-center">
+        <p class="font-heading font-bold text-lg text-slate-800 mb-1">Tidak dapat membaca Google Sheet secara automatik</p>
+        <p class="text-sm text-slate-500">
+          ${fail
+            ? "Halaman ini dibuka terus daripada komputer (<span class='font-mono-code text-xs'>file://</span>). Pelayar menyekat capaian data ke internet dalam keadaan ini."
+            : "Pastikan Google Sheet diterbitkan: <b>File → Share → Publish to web → CSV</b>."}
+        </p>
+      </div>
+
+      <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-sm text-slate-700">
+        <p class="font-semibold text-indigo-900 mb-1">Penyelesaian kekal</p>
+        <p class="text-xs leading-relaxed">Muat naik <span class="font-mono-code">dashboard.html</span> ke GitHub Pages, kemudian buka melalui pautan <span class="font-mono-code">https://…</span>. Data akan dimuatkan sendiri tanpa langkah tambahan.</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+        <div>
+          <p class="font-semibold text-slate-800 text-sm mb-1">Sementara itu — tampal data secara manual</p>
+          <ol class="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+            <li>Buka Google Sheet cikgu</li>
+            <li>Pilih semua data termasuk baris tajuk (<span class="font-mono-code">Ctrl + A</span>), salin (<span class="font-mono-code">Ctrl + C</span>)</li>
+            <li>Tampal ke dalam kotak di bawah, kemudian klik <b>Papar Dashboard</b></li>
+          </ol>
+        </div>
+        <textarea id="tampal-data" rows="5" placeholder="Tampal data Sheet di sini…"
+          class="w-full text-xs font-mono-code border border-slate-200 rounded-xl p-3 outline-none focus:border-indigo-500"></textarea>
+        <button onclick="prosesTampalan()"
+          class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition">
+          Papar Dashboard
+        </button>
+      </div>
+
+      <p class="text-[11px] text-center text-slate-400 font-mono-code">${err.message}</p>
+    </div>`;
+}
+
+/* Data disalin daripada Google Sheet menggunakan tab sebagai pemisah, bukan koma. */
+function prosesTampalan() {
+  const teks = document.getElementById("tampal-data").value.trim();
+  if (!teks) return;
+  const guna = teks.includes("\t") ? teks.replace(/\t/g, ",") : teks;
+  try {
+    prosesCSV(guna);
+  } catch (e) {
+    alert("Data tidak dapat dibaca. Pastikan baris tajuk turut disalin.");
+  }
+}
+
+function prosesCSV(teks) {
+  const status = document.getElementById("status");
+  const kandungan = document.getElementById("kandungan");
+  const baris = bacaCSV(teks);
+
+  if (baris.length < 2) {
+    status.classList.remove("hidden");
+    kandungan.classList.add("hidden");
+    status.innerHTML = `<p class="font-heading font-bold text-slate-700 mb-1">Belum ada rekod</p>
+      <p class="text-sm text-slate-500">Sheet masih kosong. Dashboard akan terisi sebaik sahaja murid menghantar cubaan pertama.</p>`;
+    return;
+  }
+
+  {
+    const tajuk = baris[0];
+    const iTarikh = cariLajur(tajuk, "Tarikh");
+    const iSesi   = cariLajur(tajuk, "Sesi");
+    const iNama   = cariLajur(tajuk, "Nama");
+    const iKelas  = cariLajur(tajuk, "Kelas");
+    const iNegeri = cariLajur(tajuk, "Negeri");
+    const iSet    = cariLajur(tajuk, "Set", "Kertas");
+    const iMod    = cariLajur(tajuk, "Mod");
+    const iCubaan = cariLajur(tajuk, "Cubaan Ke", "CubaanKe", "Cubaan");
+    const iBetul  = cariLajur(tajuk, "Betul");
+    const iJumlah = cariLajur(tajuk, "Jumlah");
+    const iWajar  = cariLajur(tajuk, "Wajaran SPM", "WajaranSpm", "Wajaran", "Peratus");
+    const iSalah  = cariLajur(tajuk, "Soalan Salah", "Salah");
+
+    SEMUA = baris.slice(1).map(r => ({
+      tarikh: iTarikh > -1 ? r[iTarikh] : "",
+      sesi:   iSesi   > -1 ? r[iSesi]   : "",
+      nama:  (iNama   > -1 ? r[iNama]   : "").trim(),
+      kelas: (iKelas  > -1 ? r[iKelas]  : "").trim(),
+      negeri:(iNegeri > -1 ? r[iNegeri] : "").trim(),
+      set:   (iSet    > -1 ? r[iSet]    : "").trim(),
+      mod:   (iMod    > -1 ? r[iMod]    : "").trim(),
+      cubaanKe: nombor(iCubaan > -1 ? r[iCubaan] : 0),
+      betul:  nombor(iBetul  > -1 ? r[iBetul]  : 0),
+      jumlah: nombor(iJumlah > -1 ? r[iJumlah] : 0),
+      wajaran: nombor(iWajar > -1 ? r[iWajar] : 0),
+      salahNo: (iSalah > -1 ? String(r[iSalah]) : "")
+                 .split(",").map(x => x.trim()).filter(x => x && x !== "Tiada")
+    })).filter(x => x.nama);
+
+    if (SEMUA.length === 0) {
+      status.classList.remove("hidden");
+      kandungan.classList.add("hidden");
+      status.innerHTML = `<p class="font-heading font-bold text-slate-700 mb-1">Belum ada rekod murid</p>
+        <p class="text-sm text-slate-500">Sheet mempunyai tajuk lajur tetapi belum ada data cubaan.</p>`;
+      return;
+    }
+
+    status.classList.add("hidden");
+    kandungan.classList.remove("hidden");
+    binaSemua();
+    document.getElementById("nota-kemaskini").textContent =
+      `${SEMUA.length} rekod dimuatkan · dikemas kini ${new Date().toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit" })}`;
+  }
+}
+
+/* ---------- Penapisan ---------- */
+function dataTapis() {
+  return SEMUA.filter(r =>
+    (penapisKelas === "Semua" || r.kelas === penapisKelas) &&
+    (penapisMod === "Semua" || r.mod === penapisMod)
+  );
+}
+function tukarKelas(k) { penapisKelas = k; binaSemua(); }
+function tukarMod(m) { penapisMod = m; binaSemua(); }
+
+function pil(teks, aktif, fungsi) {
+  return `<button onclick="${fungsi}" class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+    aktif ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${teks}</button>`;
+}
+
+function binaSemua() {
+  binaPenapis();
+  binaKadRingkas();
+  binaPilihKertas();
+  binaSoalanSalah();
+  binaBandingKelas();
+  binaRingkasanKertas();
+  binaMurid();
+}
+
+function binaPenapis() {
+  const kelas = ["Semua", ...Array.from(new Set(SEMUA.map(r => r.kelas).filter(Boolean))).sort()];
+  document.getElementById("penapis-kelas").innerHTML =
+    kelas.map(k => pil(k, penapisKelas === k, `tukarKelas('${k}')`)).join("");
+
+  const mod = ["Semua", ...Array.from(new Set(SEMUA.map(r => r.mod).filter(Boolean))).sort()];
+  document.getElementById("penapis-mod").innerHTML =
+    mod.map(m => pil(m, penapisMod === m, `tukarMod('${m}')`)).join("");
+}
+
+function kadStat(label, nilai, warna, kecil) {
+  return `<div class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
+    <div class="text-[10px] text-slate-400 uppercase font-mono-code tracking-wider">${label}</div>
+    <div class="font-heading text-2xl sm:text-3xl font-extrabold ${warna} leading-tight mt-1">${nilai}</div>
+    ${kecil ? `<div class="text-[11px] text-slate-400 mt-0.5">${kecil}</div>` : ""}
+  </div>`;
+}
+
+function binaKadRingkas() {
+  const d = dataTapis();
+  const murid = new Set(d.map(r => r.nama)).size;
+  const purata = d.length ? Math.round(d.reduce((a, b) => a + b.wajaran, 0) / d.length * 10) / 10 : 0;
+  const tertinggi = d.length ? Math.max(...d.map(r => r.wajaran)) : 0;
+
+  document.getElementById("kad-ringkas").innerHTML =
+    kadStat("Jumlah Cubaan", d.length, "text-slate-900") +
+    kadStat("Murid Terlibat", murid, "text-indigo-600") +
+    kadStat("Purata Wajaran", purata + "%", "text-amber-600", `daripada ${WAJARAN_K1}% wajaran K1`) +
+    kadStat("Wajaran Tertinggi", tertinggi + "%", "text-emerald-600");
+}
+
+function binaPilihKertas() {
+  const kertas = Array.from(new Set(dataTapis().map(r => `${r.negeri} · ${r.set}`))).sort();
+  const pilih = document.getElementById("pilih-kertas-salah");
+  const sedia = pilih.value;
+  pilih.innerHTML = kertas.map(k => `<option value="${k}">${k}</option>`).join("");
+  if (kertas.includes(sedia)) pilih.value = sedia;
+}
+
+function binaSoalanSalah() {
+  const bekas = document.getElementById("analisis-salah");
+  const kertasPilih = document.getElementById("pilih-kertas-salah").value;
+  const d = dataTapis().filter(r => `${r.negeri} · ${r.set}` === kertasPilih);
+
+  if (!d.length) {
+    bekas.innerHTML = `<p class="text-sm text-slate-500 text-center py-4">Tiada rekod bagi kertas ini.</p>`;
+    return;
+  }
+
+  const kira = {};
+  d.forEach(r => r.salahNo.forEach(n => { kira[n] = (kira[n] || 0) + 1; }));
+  const senarai = Object.entries(kira)
+    .map(([no, bil]) => ({ no, bil, peratus: Math.round(bil / d.length * 100) }))
+    .sort((a, b) => b.bil - a.bil || Number(a.no) - Number(b.no))
+    .slice(0, 15);
+
+  if (!senarai.length) {
+    bekas.innerHTML = `<p class="text-sm text-emerald-600 text-center py-4 font-semibold">Tiada soalan salah direkodkan bagi kertas ini.</p>`;
+    return;
+  }
+
+  bekas.innerHTML = `
+    <p class="text-[11px] text-slate-400 mb-3 font-mono-code">Berdasarkan ${d.length} cubaan · 15 soalan teratas</p>
+    <div class="space-y-2">
+      ${senarai.map(s => {
+        const warna = s.peratus >= 70 ? "bg-red-500" : s.peratus >= 40 ? "bg-amber-500" : "bg-indigo-500";
+        const teksWarna = s.peratus >= 70 ? "text-red-600" : s.peratus >= 40 ? "text-amber-600" : "text-indigo-600";
+        return `
+          <div class="flex items-center gap-3">
+            <span class="font-mono-code text-xs font-bold text-slate-500 w-12 shrink-0">S${s.no}</span>
+            <div class="flex-1 h-6 bg-slate-100 rounded-lg overflow-hidden">
+              <div class="h-full ${warna} rounded-lg transition-all" style="width:${Math.max(s.peratus, 4)}%"></div>
+            </div>
+            <span class="font-mono-code text-xs font-bold ${teksWarna} w-20 text-right shrink-0">${s.peratus}% (${s.bil})</span>
+          </div>`;
+      }).join("")}
+    </div>
+    <p class="text-[11px] text-slate-400 mt-3">Merah = 70% ke atas murid tersilap · Kuning = 40–69% · Ungu = bawah 40%</p>`;
+}
+
+function binaBandingKelas() {
+  const bekas = document.getElementById("banding-kelas");
+  const kelasSenarai = Array.from(new Set(SEMUA.map(r => r.kelas).filter(Boolean))).sort();
+
+  if (!kelasSenarai.length) { bekas.innerHTML = ""; return; }
+
+  bekas.innerHTML = kelasSenarai.map(k => {
+    const d = SEMUA.filter(r => r.kelas === k && (penapisMod === "Semua" || r.mod === penapisMod));
+    if (!d.length) return "";
+    const murid = new Set(d.map(r => r.nama)).size;
+    const purata = Math.round(d.reduce((a, b) => a + b.wajaran, 0) / d.length * 10) / 10;
+    const tertinggi = Math.max(...d.map(r => r.wajaran));
+
+    // Taburan gred berasaskan peratus mentah (betul/jumlah)
+    const gred = { Cemerlang: 0, Baik: 0, Memuaskan: 0, Ulangkaji: 0 };
+    d.forEach(r => {
+      const p = r.jumlah ? (r.betul / r.jumlah * 100) : 0;
+      if (p >= 80) gred.Cemerlang++;
+      else if (p >= 65) gred.Baik++;
+      else if (p >= 50) gred.Memuaskan++;
+      else gred.Ulangkaji++;
+    });
+    const jum = d.length;
+    const bar = [
+      { n: "Cemerlang", v: gred.Cemerlang, c: "bg-emerald-500" },
+      { n: "Baik", v: gred.Baik, c: "bg-blue-500" },
+      { n: "Memuaskan", v: gred.Memuaskan, c: "bg-amber-500" },
+      { n: "Perlu ulang kaji", v: gred.Ulangkaji, c: "bg-red-500" }
+    ];
+
+    return `
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 space-y-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="font-heading font-extrabold text-lg text-slate-900">${k}</h3>
+          <span class="text-[11px] font-mono-code bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg border border-indigo-100">${murid} murid</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div><div class="text-[10px] text-slate-400 uppercase font-mono-code">Cubaan</div><div class="font-heading font-extrabold text-lg text-slate-800">${jum}</div></div>
+          <div><div class="text-[10px] text-slate-400 uppercase font-mono-code">Purata</div><div class="font-heading font-extrabold text-lg text-amber-600">${purata}%</div></div>
+          <div><div class="text-[10px] text-slate-400 uppercase font-mono-code">Terbaik</div><div class="font-heading font-extrabold text-lg text-emerald-600">${tertinggi}%</div></div>
+        </div>
+        <div>
+          <div class="flex h-3 rounded-full overflow-hidden bg-slate-100">
+            ${bar.filter(b => b.v).map(b => `<div class="${b.c}" style="width:${b.v / jum * 100}%" title="${b.n}: ${b.v}"></div>`).join("")}
+          </div>
+          <div class="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+            ${bar.map(b => `<span class="text-[10px] text-slate-500 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full ${b.c}"></span>${b.n} (${b.v})</span>`).join("")}
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function binaRingkasanKertas() {
+  const d = dataTapis();
+  const kumpul = {};
+  d.forEach(r => {
+    const kunci = `${r.negeri} · ${r.set}`;
+    (kumpul[kunci] = kumpul[kunci] || []).push(r);
+  });
+
+  const baris = Object.entries(kumpul).map(([nama, arr]) => {
+    const purata = Math.round(arr.reduce((a, b) => a + b.wajaran, 0) / arr.length * 10) / 10;
+    return {
+      nama, cubaan: arr.length,
+      murid: new Set(arr.map(r => r.nama)).size,
+      purata, tertinggi: Math.max(...arr.map(r => r.wajaran))
+    };
+  }).sort((a, b) => a.purata - b.purata);
+
+  document.getElementById("ringkasan-kertas").innerHTML = `
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-[11px] uppercase text-slate-500 font-mono-code">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold">Kertas</th>
+            <th class="text-center px-3 py-3 font-semibold">Murid</th>
+            <th class="text-center px-3 py-3 font-semibold">Cubaan</th>
+            <th class="text-center px-3 py-3 font-semibold">Purata</th>
+            <th class="text-center px-4 py-3 font-semibold">Terbaik</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${baris.map((b, i) => `
+            <tr class="hover:bg-slate-50/70 transition">
+              <td class="px-4 py-3 font-semibold text-slate-800">
+                ${b.nama}
+                ${i === 0 && baris.length > 1 ? `<span class="ml-2 text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-100">Paling sukar</span>` : ""}
+              </td>
+              <td class="text-center px-3 py-3 font-mono-code text-slate-600">${b.murid}</td>
+              <td class="text-center px-3 py-3 font-mono-code text-slate-600">${b.cubaan}</td>
+              <td class="text-center px-3 py-3 font-mono-code font-bold text-amber-600">${b.purata}%</td>
+              <td class="text-center px-4 py-3 font-mono-code font-bold text-emerald-600">${b.tertinggi}%</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function binaMurid() {
+  const cari = (document.getElementById("cari-murid").value || "").toLowerCase().trim();
+  const d = dataTapis();
+  const kumpul = {};
+  d.forEach(r => {
+    const kunci = r.nama + "|" + r.kelas;
+    (kumpul[kunci] = kumpul[kunci] || []).push(r);
+  });
+
+  let senarai = Object.entries(kumpul).map(([kunci, arr]) => {
+    const [nama, kelas] = kunci.split("|");
+    const terbaik = Math.max(...arr.map(r => r.wajaran));
+    const susun = [...arr].sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
+    const pertama = susun[0].wajaran, terkini = susun[susun.length - 1].wajaran;
+    return {
+      nama, kelas, cubaan: arr.length, terbaik,
+      purata: Math.round(arr.reduce((a, b) => a + b.wajaran, 0) / arr.length * 10) / 10,
+      beza: Math.round((terkini - pertama) * 10) / 10,
+      kertas: new Set(arr.map(r => `${r.negeri} · ${r.set}`)).size,
+      rekod: susun
+    };
+  }).sort((a, b) => b.terbaik - a.terbaik);
+
+  if (cari) senarai = senarai.filter(m => m.nama.toLowerCase().includes(cari));
+
+  if (!senarai.length) {
+    document.getElementById("senarai-murid").innerHTML =
+      `<p class="text-sm text-slate-500 text-center py-8">Tiada murid sepadan.</p>`;
+    return;
+  }
+
+  document.getElementById("senarai-murid").innerHTML = `
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-[11px] uppercase text-slate-500 font-mono-code">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold">Murid</th>
+            <th class="text-center px-3 py-3 font-semibold">Kertas</th>
+            <th class="text-center px-3 py-3 font-semibold">Cubaan</th>
+            <th class="text-center px-3 py-3 font-semibold">Purata</th>
+            <th class="text-center px-3 py-3 font-semibold">Terbaik</th>
+            <th class="text-center px-4 py-3 font-semibold">Perubahan</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          ${senarai.map((m, idx) => `
+            <tr class="hover:bg-slate-50/70 transition cursor-pointer" onclick="togol('m${idx}')">
+              <td class="px-4 py-3">
+                <div class="font-semibold text-slate-800">${m.nama}</div>
+                <div class="text-[11px] text-slate-400 font-mono-code">${m.kelas}</div>
+              </td>
+              <td class="text-center px-3 py-3 font-mono-code text-slate-600">${m.kertas}</td>
+              <td class="text-center px-3 py-3 font-mono-code text-slate-600">${m.cubaan}</td>
+              <td class="text-center px-3 py-3 font-mono-code text-amber-600 font-bold">${m.purata}%</td>
+              <td class="text-center px-3 py-3 font-mono-code text-emerald-600 font-bold">${m.terbaik}%</td>
+              <td class="text-center px-4 py-3 font-mono-code font-bold ${
+                m.beza > 0 ? "text-emerald-600" : m.beza < 0 ? "text-red-500" : "text-slate-400"}">
+                ${m.beza > 0 ? "+" : ""}${m.beza}%
+              </td>
+            </tr>
+            <tr id="m${idx}" class="hidden bg-slate-50/60">
+              <td colspan="6" class="px-4 py-3">
+                <div class="space-y-1.5">
+                  ${m.rekod.map(r => `
+                    <div class="flex items-center justify-between gap-3 text-xs bg-white px-3 py-2 rounded-lg border border-slate-200">
+                      <span class="text-slate-700 font-semibold">${r.negeri} · ${r.set}</span>
+                      <span class="text-slate-400 font-mono-code hidden sm:inline">${r.mod} · Kali ${r.cubaanKe}</span>
+                      <span class="text-slate-500 font-mono-code">${r.betul}/${r.jumlah}</span>
+                      <span class="font-mono-code font-bold text-indigo-600">${r.wajaran}%</span>
+                    </div>`).join("")}
+                </div>
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function togol(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle("hidden");
+}
+
+muatData();
+</script>
+</body>
+</html>
