@@ -130,6 +130,10 @@ button{font-family:inherit;font-size:16px;cursor:pointer;border-radius:3px}
      Contoh: "2025/2026" → "2026/2027". Rujuk PANDUAN.md */
   const SESI = "2025/2026";
 
+  /* WAJARAN_K1 — wajaran Kertas 1 terhadap gred keseluruhan Perniagaan (peratus).
+     Contoh: SPM Perniagaan 3766 → K1=20%, K2=60%, K3=20%. Tukar jika format berubah. */
+  const WAJARAN_K1 = 20;
+
   /* Set soalan didaftarkan oleh fail dalam folder soalan/ */
   const SENARAI_SET = [];
   function daftarSet(set){ SENARAI_SET.push(set); }
@@ -254,7 +258,7 @@ function rekodSemua(){
 function rekodSet(idSet){ return rekodSemua().filter(x=>x.idSet===idSet); }
 function markahTerbaik(idSet){
   const r = rekodSet(idSet);
-  return r.length ? Math.max(...r.map(x=>x.peratus)) : null;
+  return r.length ? Math.max(...r.map(x=>x.wajaranSpm)) : null;
 }
 function binaMenu(){
   $("papar-murid").textContent = murid.nama + " · " + murid.kelas;
@@ -356,12 +360,13 @@ function tamat(){
   let betul=0; const salahNo=[];
   soalan.forEach((q,n)=>{ if(jawapanMurid[n]===q.j) betul++; else salahNo.push(q.no); });
   const peratus = Math.round(betul/soalan.length*100);
+  const wajaranSpm = Math.round(peratus * WAJARAN_K1 / 100 * 10) / 10;
   const lepas = rekodSet(setAktif.id);
   const rekod = {tarikh:new Date().toISOString(), sesi:SESI, nama:murid.nama, kelas:murid.kelas,
     idSet:setAktif.id, negeri:setAktif.negeri, namaSet:setAktif.nama,
     mod:modUjian?"Peperiksaan":"Latihan", cubaanKe:lepas.length+1,
-    terbaikSebelum: lepas.length ? Math.max(...lepas.map(x=>x.peratus)) : null,
-    betul, jumlah:soalan.length, peratus, salahNo};
+    terbaikSebelum: lepas.length ? Math.max(...lepas.map(x=>x.wajaranSpm)) : null,
+    betul, jumlah:soalan.length, peratus, wajaranSpm, salahNo};
   const semua = rekodSemua(); semua.push(rekod);
   Simpan.tulis(KUNCI_REKOD, JSON.stringify(semua.slice(-80)));
   binaResit(rekod); hantarKeCikgu(rekod); tunjuk("skrin-slip");
@@ -378,7 +383,7 @@ function binaResit(r){
     + " · " + t.toLocaleTimeString("ms-MY",{hour:"2-digit",minute:"2-digit"});
   let banding = "";
   if(r.terbaikSebelum !== null){
-    const beza = r.peratus - r.terbaikSebelum;
+    const beza = Math.round((r.wajaranSpm - r.terbaikSebelum)*10)/10;
     const arah = beza > 0 ? "+"+beza+"% lebih baik" : (beza === 0 ? "sama" : beza+"%");
     banding = `<div class="baris"><span>Terbaik sebelum ini</span><span>${r.terbaikSebelum}%</span></div>
                <div class="baris"><span>Perubahan</span><span>${arah}</span></div>`;
@@ -398,7 +403,8 @@ function binaResit(r){
     ${banding}
     <div class="baris"><span>Soalan salah</span><span>${r.salahNo.length ? r.salahNo.join(", ") : "Tiada"}</span></div>
     <div class="resit-jumlah">
-      <div class="markah-besar">${r.peratus}%</div>
+      <div class="tag" style="margin-bottom:2px;text-align:center">Wajaran SPM</div>
+      <div class="markah-besar">${r.wajaranSpm}%</div>
       <div class="gred">${gred(r.peratus)}</div>
     </div>
     <div class="status-hantar" id="status-hantar">Merekod…</div>`;
@@ -435,21 +441,21 @@ function binaRekod(){
   }
   const data = semua.slice(-12), W=320,H=150,pad=26;
   const x = i => pad + (data.length===1 ? (W-2*pad)/2 : i*(W-2*pad)/(data.length-1));
-  const y = p => H - pad - (p/100)*(H-2*pad);
-  const titik = data.map((d,i)=>`${x(i)},${y(d.peratus)}`).join(" ");
-  const bulat = data.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.peratus)}" r="3.5" fill="#2F6B4F"/>`).join("");
-  const rujuk = [0,50,100].map(v=>
-    `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#C6D2BC" stroke-width="1" ${v===50?'stroke-dasharray="3 3"':''}/>
+  const y = p => H - pad - (p/WAJARAN_K1)*(H-2*pad);
+  const titik = data.map((d,i)=>`${x(i)},${y(d.wajaranSpm)}`).join(" ");
+  const bulat = data.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d.wajaranSpm)}" r="3.5" fill="#2F6B4F"/>`).join("");
+  const rujuk = [0,WAJARAN_K1/2,WAJARAN_K1].map(v=>
+    `<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="#C6D2BC" stroke-width="1" ${v===WAJARAN_K1/2?'stroke-dasharray="3 3"':''}/>
      <text x="4" y="${y(v)+4}" font-family="Space Mono, monospace" font-size="9" fill="#5A6B5F">${v}</text>`).join("");
-  const purata = Math.round(semua.reduce((a,b)=>a+b.peratus,0)/semua.length);
-  const terbaik = Math.max(...semua.map(d=>d.peratus));
+  const purata = Math.round(semua.reduce((a,b)=>a+b.wajaranSpm,0)/semua.length*10)/10;
+  const terbaik = Math.max(...semua.map(d=>d.wajaranSpm));
   let ringkasan = "";
   const kumpul = {};
   semua.forEach(d=>{ (kumpul[d.idSet] = kumpul[d.idSet] || []).push(d); });
   Object.keys(kumpul).forEach(id=>{
-    const r = kumpul[id], tinggi = Math.max(...r.map(x=>x.peratus));
+    const r = kumpul[id], tinggi = Math.max(...r.map(x=>x.wajaranSpm));
     ringkasan += `<div class="rekod-baris">
-      <span>${r[0].negeri} ${r[0].namaSet}<br><span class="tarikh">${r.length} cubaan · terkini ${r[r.length-1].peratus}%</span></span>
+      <span>${r[0].negeri} ${r[0].namaSet}<br><span class="tarikh">${r.length} cubaan · terkini ${r[r.length-1].wajaranSpm}%</span></span>
       <span class="peratus">${tinggi}%</span></div>`;
   });
 
@@ -458,11 +464,11 @@ function binaRekod(){
     const t = new Date(d.tarikh);
     senarai += `<div class="rekod-baris">
       <span>${d.negeri} ${d.namaSet}<br><span class="tarikh">${t.toLocaleDateString("ms-MY",{day:"2-digit",month:"short"})} · ${d.mod}</span></span>
-      <span class="peratus">${d.peratus}%</span></div>`;
+      <span class="peratus">${d.wajaranSpm}%</span></div>`;
   });
   bekas.innerHTML = `
     <div class="carta">
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Graf peratus markah mengikut percubaan">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Graf Wajaran SPM mengikut percubaan">
         ${rujuk}
         <polyline points="${titik}" fill="none" stroke="#2F6B4F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
         ${bulat}
@@ -471,8 +477,8 @@ function binaRekod(){
     </div>
     <div class="kad" style="font-family:'Space Mono',monospace;font-size:13px">
       <div class="baris"><span>Jumlah percubaan</span><span>${semua.length}</span></div>
-      <div class="baris"><span>Purata markah</span><span>${purata}%</span></div>
-      <div class="baris"><span>Markah tertinggi</span><span>${terbaik}%</span></div>
+      <div class="baris"><span>Purata Wajaran SPM</span><span>${purata}%</span></div>
+      <div class="baris"><span>Wajaran SPM tertinggi</span><span>${terbaik}%</span></div>
     </div>
     <h2 class="tajuk-bhg">Ringkasan setiap kertas</h2>
     ${ringkasan}
@@ -498,7 +504,7 @@ function hantarKeCikgu(r){
     method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify({tarikh:r.tarikh,sesi:r.sesi,nama:r.nama,kelas:r.kelas,negeri:r.negeri,
       set:r.namaSet,mod:r.mod,cubaanKe:r.cubaanKe,betul:r.betul,jumlah:r.jumlah,
-      peratus:r.peratus,salah:r.salahNo.join(", ")})
+      wajaranSpm:r.wajaranSpm,salah:r.salahNo.join(", ")})
   })
   .then(()=> status.textContent = "Markah telah dihantar kepada cikgu")
   .catch(()=> status.textContent = "Gagal menghantar. Semak sambungan internet, markah kekal pada peranti ini.");
@@ -508,4 +514,3 @@ muat();
 </script>
 </body>
 </html>
-
