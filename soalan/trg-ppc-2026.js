@@ -1,5 +1,5 @@
 daftarSet({
-id:"trg-ppc-2026", negeri:"Terengganu", nama:"PPC Percubaan SPM 2026 - Kertas 1", minit:75,
+id:"trg-ppc-2026", negeri:"Terengganu", nama:"PPC K1 2026", minit:75,
 soalan:[
 
 {no:1,s:"Antara berikut, manakah merupakan organisasi bermotifkan untung?",
