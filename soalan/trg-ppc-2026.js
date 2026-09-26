@@ -1,5 +1,5 @@
 daftarSet({
-id:"trg-ppc-2026", negeri:"Terengganu", nama:"PPC K1 2026", minit:75,
+id:"trg-ppc-2026", tutup:"2026-09-26T22:30:00+08:00", negeri:"Terengganu", nama:"PPC K1 2026", minit:75,
 soalan:[
 
 {no:1,s:"Antara berikut, manakah merupakan organisasi bermotifkan untung?",
