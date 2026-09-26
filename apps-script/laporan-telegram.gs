@@ -26,8 +26,8 @@ const JAM_LAPORAN = 22; // 10 malam
 // Kertas yang dilaporkan. Tambah baris baharu untuk kertas lain.
 // "set" boleh senaraikan beberapa nama (contoh: nama lama sebelum ditukar).
 const KERTAS_LAPORAN = [
-  { negeri: "Terengganu", set: ["PPC K1 2026", "PPC Percubaan SPM 2026 - Kertas 1"] }
-  // { negeri: "Johor",        set: ["PPC K1 2026"] },
+  { negeri: "Terengganu", set: ["PPC K1 2026", "PPC Percubaan SPM 2026 - Kertas 1"] },
+  { negeri: "Johor",      set: ["PPC K1 2026"] },
   // { negeri: "Kuala Lumpur", set: ["PPC K1 2026"] },
 ];
 
