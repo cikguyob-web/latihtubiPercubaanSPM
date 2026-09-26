@@ -484,8 +484,13 @@ let pemasa = null;
 let bakiSaat = 0;
 let penapisNegeri = "Semua";
 
-/* Set soalan dimuatkan daripada fail dalam folder soalan/ (lihat pautan di bahagian atas fail). */
-const SENARAI_SET = (window.__SET_SOALAN__ || []);
+/* Set soalan dimuatkan daripada fail dalam folder soalan/ (lihat pautan di bahagian atas fail).
+   Set yang ada medan tutup:"YYYY-MM-DDTHH:MM:SS+08:00" disembunyikan selepas masa itu. */
+const SEMUA_SET = (window.__SET_SOALAN__ || []);
+function setDibuka() {
+  const kini = Date.now();
+  return SEMUA_SET.filter(s => !s.tutup || kini < new Date(s.tutup).getTime());
+}
 
 function muatAplikasi() {
   const simpanan = Simpan.baca(KUNCI_MURID);
@@ -576,6 +581,9 @@ function binaMenu() {
   const bekas = document.getElementById("senarai-kertas");
   const bekasFilter = document.getElementById("bekas-filter-negeri");
   
+  const SENARAI_SET = setDibuka();
+  if (!SENARAI_SET.some(s => s.negeri === penapisNegeri)) penapisNegeri = "Semua";
+
   if (SENARAI_SET.length === 0) {
     bekas.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-500">Tiada set soalan dimuatkan.</div>`;
     return;
@@ -627,6 +635,13 @@ function binaMenu() {
   }).join("");
 }
 
+// Semak setiap minit: jika ada set yang baru ditutup, kemas kini menu.
+let bilSetDibuka = setDibuka().length;
+setInterval(() => {
+  const bil = setDibuka().length;
+  if (bil !== bilSetDibuka) { bilSetDibuka = bil; binaMenu(); }
+}, 60000);
+
 function tukarPenapisNegeri(negeri) {
   penapisNegeri = negeri;
   binaMenu();
@@ -634,7 +649,7 @@ function tukarPenapisNegeri(negeri) {
 
 
 function mulaKuiz(idSet, ujian) {
-  setAktif = SENARAI_SET.find(s => s.id === idSet);
+  setAktif = setDibuka().find(s => s.id === idSet);
   if (!setAktif) return;
 
   soalan = [...setAktif.soalan];
