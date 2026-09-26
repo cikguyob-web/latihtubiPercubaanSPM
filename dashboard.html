@@ -77,6 +77,31 @@ body{
         </div>
       </section>
 
+      <!-- Senarai murid mengikut kelas -->
+      <section class="space-y-3">
+        <div>
+          <h2 class="font-heading text-xl font-extrabold text-slate-900">Senarai Murid Mengikut Kelas</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Pilih kertas dan mod untuk melihat murid yang sudah menjawab.</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 grid sm:grid-cols-2 gap-3">
+          <label class="block">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">1. Pilih Kertas</span>
+            <select id="kk-kertas" onchange="binaKelasMurid()"
+                    class="mt-1 w-full text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-indigo-500"></select>
+          </label>
+          <label class="block">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">2. Pilih Mod</span>
+            <select id="kk-mod" onchange="binaKelasMurid()"
+                    class="mt-1 w-full text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 outline-none focus:border-indigo-500">
+              <option value="Semua">Latihan &amp; Peperiksaan</option>
+              <option value="Latihan">Latihan</option>
+              <option value="Peperiksaan">Peperiksaan</option>
+            </select>
+          </label>
+        </div>
+        <div id="kk-senarai" class="grid md:grid-cols-2 gap-4"></div>
+      </section>
+
       <!-- Analisis soalan paling salah (disembunyikan buat sementara — buang style="display:none" untuk papar semula) -->
       <section class="space-y-3" style="display:none">
         <div class="flex items-end justify-between gap-3">
@@ -324,6 +349,8 @@ function pil(teks, aktif, fungsi) {
 function binaSemua() {
   binaPenapis();
   binaKadRingkas();
+  binaPilihKertasKelas();
+  binaKelasMurid();
   binaPilihKertas();
   binaSoalanSalah();
   binaBandingKelas();
@@ -360,6 +387,62 @@ function binaKadRingkas() {
     kadStat("Murid Terlibat", murid, "text-indigo-600") +
     kadStat("Purata Wajaran", purata + "%", "text-amber-600", `daripada ${WAJARAN_K1}% wajaran K1`) +
     kadStat("Wajaran Tertinggi", tertinggi + "%", "text-emerald-600");
+}
+
+/* ---------- Senarai murid mengikut kelas ---------- */
+const KELAS_TETAP = ["5 Intelek", "5 Dedikasi"];
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function binaPilihKertasKelas() {
+  const kertas = Array.from(new Set(SEMUA.map(r => `${r.negeri} · ${r.set}`))).sort();
+  const pilih = document.getElementById("kk-kertas");
+  const sedia = pilih.value;
+  pilih.innerHTML = kertas.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join("");
+  if (kertas.includes(sedia)) pilih.value = sedia;
+}
+
+function binaKelasMurid() {
+  const kertas = document.getElementById("kk-kertas").value;
+  const mod = document.getElementById("kk-mod").value;
+  const d = SEMUA.filter(r => `${r.negeri} · ${r.set}` === kertas && (mod === "Semua" || r.mod === mod));
+
+  const kelasData = Array.from(new Set(SEMUA.map(r => r.kelas).filter(Boolean)));
+  const kelasSenarai = [...KELAS_TETAP, ...kelasData.filter(k => !KELAS_TETAP.some(t => t.toLowerCase() === k.toLowerCase())).sort()];
+
+  document.getElementById("kk-senarai").innerHTML = kelasSenarai.map(k => {
+    const rekodKelas = d.filter(r => r.kelas.toLowerCase() === k.toLowerCase());
+    const kumpul = {};
+    rekodKelas.forEach(r => (kumpul[r.nama.toLowerCase()] = kumpul[r.nama.toLowerCase()] || []).push(r));
+
+    const murid = Object.values(kumpul).map(arr => {
+      const terbaik = arr.reduce((a, b) => (b.wajaran > a.wajaran ? b : a));
+      return { nama: arr[0].nama, cubaan: arr.length, terbaik };
+    }).sort((a, b) => a.nama.localeCompare(b.nama, "ms"));
+
+    const isi = murid.length
+      ? `<ol class="divide-y divide-slate-100">
+          ${murid.map((m, i) => `
+            <li class="flex items-center gap-3 py-2">
+              <span class="font-mono-code text-[11px] text-slate-400 w-6 shrink-0 text-right">${i + 1}.</span>
+              <span class="flex-1 text-sm font-semibold text-slate-800">${esc(m.nama)}</span>
+              <span class="text-[11px] font-mono-code text-slate-400">${m.cubaan}× · ${m.terbaik.betul}/${m.terbaik.jumlah}</span>
+              <span class="text-xs font-mono-code font-bold text-emerald-600 w-12 text-right">${m.terbaik.wajaran}%</span>
+            </li>`).join("")}
+        </ol>`
+      : `<p class="text-sm text-slate-400 text-center py-6">Belum ada murid menjawab.</p>`;
+
+    return `
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-heading font-extrabold text-lg text-slate-900 uppercase">${esc(k)}</h3>
+          <span class="text-[11px] font-mono-code bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-100">${murid.length} murid dah jawab</span>
+        </div>
+        ${isi}
+      </div>`;
+  }).join("");
 }
 
 function binaPilihKertas() {
