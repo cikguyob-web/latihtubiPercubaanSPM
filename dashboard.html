@@ -389,15 +389,118 @@ function binaKadRingkas() {
     kadStat("Wajaran Tertinggi", tertinggi + "%", "text-emerald-600");
 }
 
-/* ---------- Senarai murid mengikut kelas ---------- */
-const KELAS_TETAP = ["5 Intelek", "5 Dedikasi"];
+/* ---------- Senarai murid mengikut kelas ----------
+   Senarai nama rasmi setiap kelas. Kemas kini di sini jika ada murid baharu/berpindah. */
+const SENARAI_KELAS = {
+  "5 Intelek": [
+    "AISYA ZULAIKHA BINTI AHMAD ZAMANI",
+    "ANISHA A/P ASHOK KUMAR",
+    "ARISSA QAISARA BINTI AZIZUL RAHMAN",
+    "BEN NELSEA A/L NASPIJOJO",
+    "FAZREENA SYAHILA BINTI JEFFRY SUHAILI",
+    "GREYSON JOSEPH A/L DEVASAKAYAM",
+    "HASVINDER SINGH A/L KESHMINDER SINGH",
+    "INTAN SHAHIRA BINTI IRWAN",
+    "JUANDA DAWINA A/P DALLAS",
+    "MANISHA CARINE A/P JAYA KUMARAN",
+    "MELDY STEFANIE NAIR",
+    "MELLYZA A/P DIWAN",
+    "MUHAMMAD AMIRUL NAHIM BIN MOHD MUSTAFA",
+    "MUHAMMAD AQIL ZHARIF BIN MOHD NIZAM",
+    "NUR HUMAIRA BINTI MOHD FAIZAL",
+    "NUR SYASYA ADRIANA BINTI MOHD FIRDAUS",
+    "NURHASHATY DAMIEA QIEFTIA BINTI NORHISSAM",
+    "NURKASIH AZZAHRA BINTI MOHD FAIZ",
+    "PIRITHIKA REDDY A/P SARAVANAN",
+    "PRIYAA THARSHINIE A/P SEKAR",
+    "RUUPIKAA A/P PATMANATHAN",
+    "VISSHAAL A/L GANESAN"
+  ],
+  "5 Dedikasi": [
+    "ALEESYA BINTI AHMAD SAUFI",
+    "DELIA ELISA A/P DESALIMA RALONE",
+    "ERNEEDARNIA A/P ZAINAL",
+    "IRIS ALYA ADRIANA BINTI NOORUL HISHAM",
+    "ISMA DAMIA BINTI ABDUL HADI",
+    "MIMIE SAMILA BINTI AHMAD SUHAIMI",
+    "MOHAMAD FAIZ FARHAN BIN BASHARUDIN",
+    "MOHAMMAD ARIS KUZAIRIE BIN AZLEY",
+    "MUHAMMAD AIZRIL DISYA BIN ABDULLAH",
+    "MUHAMMAD AQIL SUFI BIN YUSHANIF",
+    "MUHAMMAD AZFAR EID BIN SALEHUDDIN",
+    "MUHAMMAD AZMIRUL AZIQ BIN AZIZ",
+    "MUHAMMAD DANIAL NAUFAL BIN HASLIN",
+    "MUHAMMAD IZZUL ILMI BIN MOHAMAD ROFEEZAL",
+    "NUR AFIQAH BATRISYIA BINTI MOHD HAFEZ",
+    "NUR AISYAH ATIQAH BINTI SARILIJAL",
+    "NUR AQILAH BINTI LAILATUL BADRI",
+    "NUR QALESYA NABILA BINTI AHMAD MAZUKI",
+    "NUR ZURAIDA MYSARAH BINTI ZULKIFLI",
+    "NURUL DIYANA BINTI MOHAMAD",
+    "PUTERI NUR AILIS SAFINI BINTI IBRAHIM",
+    "QALIESSYA A/P SYUKRI",
+    "RISHITHA KAUR BHAL A/P JASPAL SINGH",
+    "RIYA SHASHA BINTI SHAH HAIROL",
+    "SERI ATIQAH MAISARA BINTI MOHD ARIS",
+    "SITI NUR MAYA KUINTAN BINTI RAZALI",
+    "VYNESH BINTI ZAIFULLAH",
+    "WAN NUR AINUN INSYIRAH BINTI WAN MOHD AFFENDI"
+  ]
+};
+
+/* Semua kertas yang ada di laman (dibaca daripada senarai set soalan dalam index.html). */
+let KERTAS_LAMAN = [];
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+async function muatSenaraiKertas() {
+  try {
+    const html = await (await fetch("index.html", { cache: "no-store" })).text();
+    const fail = [...html.matchAll(/<script src="(soalan\/[^"]+\.js)"/g)].map(m => m[1]);
+    const set = [];
+    window.daftarSet = s => set.push(`${s.negeri} · ${s.nama}`);
+    await Promise.all(fail.map(src => new Promise(ok => {
+      const el = document.createElement("script");
+      el.src = src; el.async = false; // kekal turutan seperti dalam index.html
+      el.onload = ok; el.onerror = ok;
+      document.head.appendChild(el);
+    })));
+    KERTAS_LAMAN = set;
+  } catch (e) {
+    KERTAS_LAMAN = [];
+  }
+  if (SEMUA.length) { binaPilihKertasKelas(); binaKelasMurid(); }
+}
+
+/* ---- Padanan nama: tahan huruf besar/kecil, BIN/BINTI/A/P/A/L dan nama yang ditaip sebahagian ---- */
+const KATA_ABAI = new Set(["BIN", "BINTI", "BT", "BTE", "B", "AP", "AL", "A", "L", "P", "S", "O", "D"]);
+function tokenNama(s) {
+  return String(s).toUpperCase().replace(/\b(A\/P|A\/L|S\/O|D\/O)\b/g, " ")
+    .replace(/[^A-Z ]/g, " ").split(/\s+/).filter(t => t && !KATA_ABAI.has(t));
+}
+function padanNama(namaTaip, kelas) {
+  const t = tokenNama(namaTaip);
+  if (!t.length) return null;
+  const cuba = senarai => {
+    const calon = senarai.filter(n => {
+      const r = tokenNama(n);
+      if (r.join(" ") === t.join(" ")) return true;
+      // Semua perkataan yang ditaip mesti ada dalam nama rasmi, dan hanya padan dengan seorang murid
+      return t.every(x => r.includes(x));
+    });
+    if (calon.length === 1) return calon[0];
+    const tepat = calon.find(n => tokenNama(n).join(" ") === t.join(" "));
+    return tepat || null;
+  };
+  const kunci = Object.keys(SENARAI_KELAS).find(k => k.toLowerCase() === String(kelas).toLowerCase());
+  return (kunci && cuba(SENARAI_KELAS[kunci])) || null;
+}
+
 function binaPilihKertasKelas() {
-  const kertas = Array.from(new Set(SEMUA.map(r => `${r.negeri} · ${r.set}`))).sort();
+  const dariRekod = Array.from(new Set(SEMUA.map(r => `${r.negeri} · ${r.set}`))).sort();
+  const kertas = [...KERTAS_LAMAN, ...dariRekod.filter(k => !KERTAS_LAMAN.includes(k))];
   const pilih = document.getElementById("kk-kertas");
   const sedia = pilih.value;
   pilih.innerHTML = kertas.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join("");
@@ -407,40 +510,83 @@ function binaPilihKertasKelas() {
 function binaKelasMurid() {
   const kertas = document.getElementById("kk-kertas").value;
   const mod = document.getElementById("kk-mod").value;
-  const d = SEMUA.filter(r => `${r.negeri} · ${r.set}` === kertas && (mod === "Semua" || r.mod === mod));
+  const rekodKertas = SEMUA.filter(r => `${r.negeri} · ${r.set}` === kertas);
 
   const kelasData = Array.from(new Set(SEMUA.map(r => r.kelas).filter(Boolean)));
-  const kelasSenarai = [...KELAS_TETAP, ...kelasData.filter(k => !KELAS_TETAP.some(t => t.toLowerCase() === k.toLowerCase())).sort()];
+  const kelasTetap = Object.keys(SENARAI_KELAS);
+  const kelasSenarai = [...kelasTetap, ...kelasData.filter(k => !kelasTetap.some(t => t.toLowerCase() === k.toLowerCase())).sort()];
 
   document.getElementById("kk-senarai").innerHTML = kelasSenarai.map(k => {
-    const rekodKelas = d.filter(r => r.kelas.toLowerCase() === k.toLowerCase());
+    const rasmi = SENARAI_KELAS[k] || [];
+    const rekodKelas = rekodKertas.filter(r => r.kelas.toLowerCase() === k.toLowerCase());
+
+    // Kumpul rekod ikut murid (nama rasmi jika padan, jika tidak nama seperti ditaip)
     const kumpul = {};
-    rekodKelas.forEach(r => (kumpul[r.nama.toLowerCase()] = kumpul[r.nama.toLowerCase()] || []).push(r));
+    const sudahJawab = new Set();
+    const tidakPadan = new Set();
+    rekodKelas.forEach(r => {
+      const padan = rasmi.length ? padanNama(r.nama, k) : null;
+      if (padan) sudahJawab.add(padan);
+      else if (rasmi.length) tidakPadan.add(r.nama);
+      if (mod !== "Semua" && r.mod !== mod) return;
+      const kunci = padan || r.nama.toUpperCase();
+      (kumpul[kunci] = kumpul[kunci] || { nama: padan || r.nama, arr: [] }).arr.push(r);
+    });
 
-    const murid = Object.values(kumpul).map(arr => {
-      const terbaik = arr.reduce((a, b) => (b.wajaran > a.wajaran ? b : a));
-      return { nama: arr[0].nama, cubaan: arr.length, terbaik };
-    }).sort((a, b) => a.nama.localeCompare(b.nama, "ms"));
+    const murid = Object.values(kumpul).map(({ nama, arr }) => ({
+      nama, cubaan: arr.length, terbaik: arr.reduce((a, b) => (b.wajaran > a.wajaran ? b : a))
+    })).sort((a, b) => a.nama.localeCompare(b.nama, "ms"));
 
-    const isi = murid.length
+    const belum = rasmi.filter(n => !sudahJawab.has(n));
+    const labelMod = mod === "Semua" ? "" : ` (${mod})`;
+
+    const senaraiJawab = murid.length
       ? `<ol class="divide-y divide-slate-100">
           ${murid.map((m, i) => `
             <li class="flex items-center gap-3 py-2">
               <span class="font-mono-code text-[11px] text-slate-400 w-6 shrink-0 text-right">${i + 1}.</span>
               <span class="flex-1 text-sm font-semibold text-slate-800">${esc(m.nama)}</span>
-              <span class="text-[11px] font-mono-code text-slate-400">${m.cubaan}× · ${m.terbaik.betul}/${m.terbaik.jumlah}</span>
+              <span class="text-[11px] font-mono-code text-slate-400 whitespace-nowrap">${m.cubaan}× · ${m.terbaik.betul}/${m.terbaik.jumlah}</span>
               <span class="text-xs font-mono-code font-bold text-emerald-600 w-12 text-right">${m.terbaik.wajaran}%</span>
             </li>`).join("")}
         </ol>`
-      : `<p class="text-sm text-slate-400 text-center py-6">Belum ada murid menjawab.</p>`;
+      : `<p class="text-sm text-slate-400 text-center py-4">Belum ada murid menjawab${labelMod}.</p>`;
+
+    const senaraiBelum = !rasmi.length ? "" : `
+      <div class="mt-4 pt-3 border-t border-slate-200">
+        <div class="flex items-center justify-between mb-1">
+          <h4 class="text-xs font-semibold text-red-600 uppercase tracking-wider">Belum jawab</h4>
+          <span class="text-[11px] font-mono-code bg-red-50 text-red-600 px-2 py-0.5 rounded-lg border border-red-100">${belum.length} murid</span>
+        </div>
+        ${belum.length
+          ? `<ol class="divide-y divide-slate-100">
+              ${belum.map((n, i) => `
+                <li class="flex items-center gap-3 py-1.5">
+                  <span class="font-mono-code text-[11px] text-slate-400 w-6 shrink-0 text-right">${i + 1}.</span>
+                  <span class="flex-1 text-sm text-slate-600">${esc(n)}</span>
+                </li>`).join("")}
+            </ol>`
+          : `<p class="text-sm text-emerald-600 font-semibold text-center py-3">🎉 Semua murid sudah menjawab kertas ini.</p>`}
+      </div>`;
+
+    const senaraiTidakPadan = !tidakPadan.size ? "" : `
+      <div class="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
+        <p class="text-[11px] font-semibold text-amber-700 mb-1">Nama tidak padan dengan senarai kelas (semak ejaan):</p>
+        <p class="text-xs text-amber-800">${[...tidakPadan].map(esc).join(" · ")}</p>
+      </div>`;
 
     return `
       <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-2 gap-2">
           <h3 class="font-heading font-extrabold text-lg text-slate-900 uppercase">${esc(k)}</h3>
-          <span class="text-[11px] font-mono-code bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-100">${murid.length} murid dah jawab</span>
+          <span class="text-[11px] font-mono-code bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-100 whitespace-nowrap">
+            ${rasmi.length ? `${sudahJawab.size}/${rasmi.length}` : murid.length} dah jawab
+          </span>
         </div>
-        ${isi}
+        <h4 class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-1">Dah jawab${labelMod}</h4>
+        ${senaraiJawab}
+        ${senaraiTidakPadan}
+        ${senaraiBelum}
       </div>`;
   }).join("");
 }
@@ -678,6 +824,7 @@ function togol(id) {
 }
 
 muatData();
+muatSenaraiKertas();
 </script>
 </body>
 </html>
